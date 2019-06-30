@@ -1,0 +1,16 @@
+# Python files
+__pycache__/
+*.py[cod]
+
+# Local folders
+static/
+media/
+
+# VSCode Files
+.vscode
+
+# Local Database
+*.sqlite3
+
+# Envirronmental Variables
+env.py
