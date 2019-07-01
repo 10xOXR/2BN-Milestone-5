@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block page_title %}Home Page{% endblock %}
+
+{% block styles %}
+<style>
+    body {
+        background: url("{% static 'img/purple-gems.jpg' %}") no-repeat center center fixed;
+        background-size: cover;
+    }
+</style>
+{% endblock %}
