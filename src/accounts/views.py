@@ -2,8 +2,17 @@ from django.shortcuts import render, redirect, reverse
 from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from accounts.forms import UserLoginForm, UserRegistrationForm
+from .forms import (
+    UserLoginForm,
+    UserRegistrationForm,
+    UserUpdateForm,
+    ProfileUpdateForm)
 
+
+def superuser(request):
+    """ Allows access to the Admin Panel for superusers """
+    if request.user.is_superuser:
+        return redirect(reverse("superuser"))
 
 def index(request):
     """ Return the index.html file """
@@ -15,7 +24,7 @@ def logout(request):
     """ Logs the user out """
     auth.logout(request)
     messages.success(request, "You have been logged out successfully!")
-    return redirect(reverse("index"))
+    return redirect(reverse("login"))
 
 
 def login(request):
@@ -32,12 +41,11 @@ def login(request):
                 password=request.POST["password"])
 
             if user:
-                auth.login(user = user, request = request)            
+                auth.login(user=user, request=request)            
                 messages.success(request, "You have logged in successfully.")
-                return redirect(reverse("index"))
+                return redirect(reverse("profile"))
             else:
-                login_form.add_error(
-                    None, "Your username or password is incorrect.")
+                messages.error(request, "Your username or password is incorrect.")
     else:
         login_form = UserLoginForm()
 
@@ -62,7 +70,7 @@ def registration(request):
             if user:
                 auth.login(user=user, request=request)
                 messages.success(request, "You have registered successfully")
-                return redirect(reverse("index"))
+                return redirect(reverse("profile"))
             else:
                 messages.error(request,
                     "There has been an error with your registration.\
@@ -75,7 +83,32 @@ def registration(request):
         request, "registration.html",
         {"registration_form": registration_form})
 
-def user_profile(request):
+
+@login_required
+def profile(request):
     """ The user's profile page """
     user = User.objects.get(email=request.user.email)
-    return render(request, "profile.html", {"profile": user})
+    if request.method == "POST":
+        user_form = UserUpdateForm(
+            request.POST,
+            instance=request.user)
+        profile_form = ProfileUpdateForm(
+            request.POST,
+            request.FILES,
+            instance=request.user.profile)
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            messages.success(request, "Your profile was updated successfully")
+            return redirect(reverse("profile"))
+    else:
+        user_form = UserUpdateForm(
+            instance=request.user)
+        profile_form = ProfileUpdateForm(
+            instance=request.user.profile)
+    context = {
+        "user_form": user_form,
+        "profile_form": profile_form,
+        "profile": user
+    }
+    return render(request, "profile.html", context)
