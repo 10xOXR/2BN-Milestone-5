@@ -2,28 +2,27 @@
 
 {% load materializecss %}
 
-{% block page_title %}Tickets{% endblock %}
+{% block page_title %}Ticket Detail{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col s12">
         <div class="card">
             <div class="card-content">
-                <h2 class="center">Tickets</h2>
-                {% for ticket in tickets %}
+                <h2 class="center">Ticket Detail</h2>
                 <p><strong>Title:</strong> {{ ticket.title }}</p>
                 <p><strong>Type:</strong> {{ ticket.ticket_type }}</p>
                 <p><strong>Raised By:</strong> {{ ticket.raised_by }}</p>
                 <p><strong>Status:</strong> {{ ticket.status }}</p>
-                <p class="truncate"><strong>Description:</strong> {{ ticket.description}}</p>
+                <p><strong>Description:</strong> {{ ticket.description}}</p>
                 <p><strong>Created:</strong> {{ ticket.raised_on}}</p>
                 <p><strong>Last Updated:</strong> {{ ticket.last_updated }}</p>
-                <br>
-                <a href="{% url 'ticket_detail' ticket.id %}" class="btn deep-purple darken-1">Details</a>
-                <br><br>
-                {% endfor %}
+                <a href="{% url 'all_tickets' %}" class="btn deep-purple darken-1">Go back</a>
+                {% if user.id == ticket.raised_by.id %}
+                <a href="{% url 'edit_ticket' ticket.id %}" class="btn deep-purple darken-1">Edit</a>
+                <a href="{% url 'delete_ticket' ticket.id %}" class="btn red darken-4">Delete</a>
+                {% endif %}
             </div>
-            <a href="{% url 'new_ticket' %}" class="btn deep-purple darken-1">New Ticket</a>
         </div>
     </div>
 </div>
