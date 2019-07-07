@@ -14,6 +14,7 @@ def superuser(request):
     if request.user.is_superuser:
         return redirect(reverse("superuser"))
 
+
 def index(request):
     """ Return the index.html file """
     return render(request, "index.html")

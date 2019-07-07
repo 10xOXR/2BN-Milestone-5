@@ -3,8 +3,8 @@ from django.contrib.auth.models import User
 from .models import Ticket, TICKET_TYPE
 
 
-class NewTicketForm(forms.ModelForm):
-    """ Displays the New Ticket form """
+class TicketForm(forms.ModelForm):
+    """ Displays the Ticket form """
 
     ticket_type = forms.ChoiceField(
         label="Ticket Type",
@@ -18,7 +18,9 @@ class NewTicketForm(forms.ModelForm):
         required=True
     )
     description = forms.CharField(
-        widget=forms.Textarea
+        max_length=1000,
+        widget=forms.Textarea(),
+        required=True
     )
 
     class Meta:
