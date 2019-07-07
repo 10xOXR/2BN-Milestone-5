@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% load materializecss %}
+
+{% block page_title %}Tickets{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col s12">
+        <div class="card">
+            <div class="card-content">
+                <h2 class="center">Tickets</h2>
+                {% for ticket in tickets %}
+                <p><strong>Title:</strong> {{ ticket.title }}</p>
+                <p><strong>Raised By:</strong> {{ ticket.raised_by }}</p>
+                <p><strong>Status:</strong> {{ ticket.status }}</p>
+                <p><strong>Description:</strong> {{ ticket.description}}</p>
+                <p><strong>Last Updated:</strong> {{ ticket.last_updated }}</p>
+                <br><br>
+                {% endfor %}
+            </div>
+            <a href="{% url 'new_ticket' %}" class="btn deep-purple darken-1">New Ticket</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

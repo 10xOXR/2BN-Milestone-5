@@ -1,15 +1,17 @@
 from django.conf.urls import url, include
 from django.contrib import admin
-from accounts import urls as urls_accounts
 from django.conf import settings
 from django.conf.urls.static import static
-from accounts.views import index, superuser
+from users import urls as urls_users
+from tickets import urls as urls_tickets
+from users.views import index, superuser
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^admin/', superuser, name="superuser"),
     url(r'^$', index, name='index'),
-    url(r'^accounts/', include(urls_accounts)),
+    url(r'^users/', include(urls_users)),
+    url(r'^tickets/', include(urls_tickets)),
 ]
 
 if settings.DEBUG:
