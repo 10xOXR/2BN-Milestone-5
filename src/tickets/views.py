@@ -53,6 +53,7 @@ def edit_ticket(request, pk):
         edit_ticket = TicketForm(request.POST, instance=ticket)
         if edit_ticket.is_valid():
             edit_ticket.instance.raised_by = request.user
+            edit_ticket.instance.last_updated = timezone.now()
             edit_ticket.save()
             return redirect(ticket_detail, ticket.pk)
     else:
