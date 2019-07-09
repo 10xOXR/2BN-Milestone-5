@@ -3,11 +3,6 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 
 
-TICKET_TYPE = (
-    ("Bug Report", "Bug Report"),
-    ("Feature Request", "Feature Request")
-)
-
 TICKET_STATUS = (
     ("To-Do (Not Started)", "To-Do (Not Started)"),
     ("In Progress", "In Progress"),
@@ -22,7 +17,7 @@ class Ticket(models.Model):
     )
     ticket_type = models.CharField(
         max_length=20,
-        choices=TICKET_TYPE,
+        blank=False,
         null=True
     )
     description = models.TextField(

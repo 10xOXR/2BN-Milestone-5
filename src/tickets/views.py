@@ -7,19 +7,38 @@ from .forms import TicketForm
 
 
 @login_required
-def new_ticket(request):
+def new_bug(request):
     if request.method == "POST":
         new_ticket_form = TicketForm(request.POST)
         if new_ticket_form.is_valid():
             new_ticket_form.instance.raised_by = request.user
-            new_ticket_form.save()
-            return redirect(all_tickets)
+            new_ticket_form.instance.ticket_type = "Bug Report"
+            new_bug = new_ticket_form.save()
+            return redirect(ticket_detail, new_bug.pk)
     else:
         new_ticket_form = TicketForm()
 
     return render(
         request,
-        "newticket.html",
+        "new_bug.html",
+        {"new_ticket_form": new_ticket_form}
+    )
+
+@login_required
+def new_feature(request):
+    if request.method == "POST":
+        new_ticket_form = TicketForm(request.POST)
+        if new_ticket_form.is_valid():
+            new_ticket_form.instance.raised_by = request.user
+            new_ticket_form.instance.ticket_type = "Feature Request"
+            new_feature = new_ticket_form.save()
+            return redirect(ticket_detail, new_feature.pk)
+    else:
+        new_ticket_form = TicketForm()
+
+    return render(
+        request,
+        "new_feature.html",
         {"new_ticket_form": new_ticket_form}
     )
 
@@ -41,7 +60,7 @@ def ticket_detail(request, pk):
 
     return render(
         request,
-        "ticketdetail.html",
+        "ticket_detail.html",
         {"ticket": ticket}
     )
 
@@ -52,7 +71,6 @@ def edit_ticket(request, pk):
     if request.method == "POST":
         edit_ticket = TicketForm(request.POST, instance=ticket)
         if edit_ticket.is_valid():
-            edit_ticket.instance.raised_by = request.user
             edit_ticket.instance.last_updated = timezone.now()
             edit_ticket.save()
             return redirect(ticket_detail, ticket.pk)
@@ -61,7 +79,7 @@ def edit_ticket(request, pk):
 
     return render(
         request,
-        "editticket.html",
+        "edit_ticket.html",
         {"edit_ticket": edit_ticket}
     )
 

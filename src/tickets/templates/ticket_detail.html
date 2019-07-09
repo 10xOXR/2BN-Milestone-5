@@ -14,16 +14,25 @@
                 <p><strong>Type:</strong> {{ ticket.ticket_type }}</p>
                 <p><strong>Raised By:</strong> {{ ticket.raised_by }}</p>
                 <p><strong>Status:</strong> {{ ticket.status }}</p>
-                <p><strong>Description:</strong> {{ ticket.description|linebreaks}}</p>
+                <p><strong>Description:</strong> {{ ticket.description|linebreaksbr}}</p>
                 <p><strong>Created:</strong> {{ ticket.raised_on}}</p>
                 <p><strong>Last Updated:</strong> {{ ticket.last_updated }}</p>
                 <a href="{% url 'all_tickets' %}" class="btn deep-purple darken-1">Go back</a>
-                {% if user.id == ticket.raised_by.id %}
+                {% if user.id == ticket.raised_by.id or user.is_superuser %}
                 <a href="{% url 'edit_ticket' ticket.id %}" class="btn deep-purple darken-1">Edit</a>
-                <a href="{% url 'delete_ticket' ticket.id %}" class="btn red darken-4">Delete</a>
+                <a href="#modal-delete" class="btn modal-trigger red darken-4">Delete</a>
                 {% endif %}
             </div>
         </div>
+    </div>
+</div>
+
+<div id="modal-delete" class="modal">
+    <div class="modal-content center-align">
+        <h3>Delete Ticket</h3>
+        <p class="center">Are you Sure? This cannot be undone!</p>
+        <a href="{% url 'delete_ticket' ticket.id %}" class="btn red darken-4">Confirm</a>
+        <a href="#" class="btn modal-close success">Cancel</a>
     </div>
 </div>
 {% endblock %}
