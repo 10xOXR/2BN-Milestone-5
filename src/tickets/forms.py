@@ -1,16 +1,11 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Ticket, TICKET_TYPE
+from .models import Ticket
 
 
 class TicketForm(forms.ModelForm):
     """ Displays the Ticket form """
 
-    ticket_type = forms.ChoiceField(
-        label="Ticket Type",
-        choices=TICKET_TYPE,
-        required=True
-    )
     title = forms.CharField(
         label="Title",
         max_length=50,
@@ -26,7 +21,6 @@ class TicketForm(forms.ModelForm):
     class Meta:
         model = Ticket
         fields = [
-            "ticket_type",
             "title",
             "description",
         ]
