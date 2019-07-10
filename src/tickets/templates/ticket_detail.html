@@ -14,13 +14,16 @@
                 <p><strong>Type:</strong> {{ ticket.ticket_type }}</p>
                 <p><strong>Raised By:</strong> {{ ticket.raised_by }}</p>
                 <p><strong>Status:</strong> {{ ticket.status }}</p>
-                <p><strong>Description:</strong> {{ ticket.description|linebreaksbr}}</p>
-                <p><strong>Created:</strong> {{ ticket.raised_on}}</p>
+                <p><strong>Description:</strong> {{ ticket.description|linebreaksbr }}</p>
+                <p><strong>Created:</strong> {{ ticket.raised_on }}</p>
                 <p><strong>Last Updated:</strong> {{ ticket.last_updated }}</p>
                 <a href="{% url 'all_tickets' %}" class="btn deep-purple darken-1">Go back</a>
                 {% if user.id == ticket.raised_by.id or user.is_superuser %}
                 <a href="{% url 'edit_ticket' ticket.id %}" class="btn deep-purple darken-1">Edit</a>
                 <a href="#modal-delete" class="btn modal-trigger red darken-4">Delete</a>
+                {% endif %}
+                {% if user.is_authenticated %}
+                <a href="{% url 'create_comment' ticket.id %}" class="btn deep-purple darken-1">Add Comment</a>
                 {% endif %}
             </div>
         </div>
@@ -35,4 +38,9 @@
         <a href="#" class="btn modal-close success">Cancel</a>
     </div>
 </div>
+
+{% for comment in comments %}
+    <p>{{ comment.comment_text }}</p>
+{% endfor %}
+
 {% endblock %}

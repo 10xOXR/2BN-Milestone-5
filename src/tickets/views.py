@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .models import Ticket
-from .forms import TicketForm
+from .models import Ticket, Comment
+from .forms import TicketForm, CommentForm
 
 
 @login_required
@@ -23,6 +23,7 @@ def new_bug(request):
         "new_bug.html",
         {"new_ticket_form": new_ticket_form}
     )
+
 
 @login_required
 def new_feature(request):
@@ -55,13 +56,37 @@ def all_tickets(request):
     )
 
 
+@login_required
+def create_comment(request, pk):
+    parent_ticket = get_object_or_404(Ticket, pk=pk)
+    if request.method == "POST":
+        new_comment = CommentForm(request.POST)
+        if new_comment.is_valid():
+            new_comment.instance.author = request.user
+            new_comment.instance.ticket = parent_ticket
+            new_comment.save()
+            return redirect(ticket_detail, parent_ticket.pk)
+    else:
+        new_comment = CommentForm()
+
+    return render(
+        request,
+        "create_comment.html",
+        {"new_comment": new_comment}
+    )
+
+
 def ticket_detail(request, pk):
     ticket = get_object_or_404(Ticket, pk=pk)
+    comments = Comment.objects.filter(ticket_id=ticket.pk)
 
     return render(
         request,
         "ticket_detail.html",
-        {"ticket": ticket}
+        {
+            "ticket": ticket,
+            "comments": comments
+        }
     )
 
 
@@ -84,6 +109,7 @@ def edit_ticket(request, pk):
     )
 
 
+@login_required
 def delete_ticket(request, pk):
     ticket = get_object_or_404(Ticket, pk=pk)
     ticket.delete()
