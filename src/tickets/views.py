@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .models import Ticket, Comment
-from .forms import TicketForm, CommentForm
+from .models import Ticket, Comment, BugUpvote
+from .forms import TicketForm, CommentForm, BugVoteForm
 
 
 @login_required
@@ -79,13 +79,25 @@ def create_comment(request, pk):
 def ticket_detail(request, pk):
     ticket = get_object_or_404(Ticket, pk=pk)
     comments = Comment.objects.filter(ticket_id=ticket.pk)
+    upvotes = BugUpvote.objects.filter(ticket_id=ticket.pk).values("user_id")
+    voters = [vote["user_id"] for vote in upvotes]
+
+    if ticket.ticket_type == "Bug Report":
+        if request.POST.get("upvote"):
+            BugUpvote.objects.create(ticket_id=ticket.pk, user_id=request.user.id)
+            return redirect(ticket_detail, ticket.pk)
+
+        elif request.POST.get("downvote"):
+            BugUpvote.objects.filter(ticket_id=ticket.pk, user_id=request.user.id).delete()
+            return redirect(ticket_detail, ticket.pk)
 
     return render(
         request,
         "ticket_detail.html",
         {
             "ticket": ticket,
-            "comments": comments
+            "comments": comments,
+            "voters": voters,
         }
     )
 
