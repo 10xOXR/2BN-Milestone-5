@@ -17,14 +17,26 @@
                 <p><strong>Description:</strong> {{ ticket.description|linebreaksbr }}</p>
                 <p><strong>Created:</strong> {{ ticket.raised_on }}</p>
                 <p><strong>Last Updated:</strong> {{ ticket.last_updated }}</p>
-                <a href="{% url 'all_tickets' %}" class="btn deep-purple darken-1">Go back</a>
+                <a href="{% url 'all_tickets' %}" class="btn waves-effect waves-light deep-purple darken-1">Go back</a>
                 {% if user.id == ticket.raised_by.id or user.is_superuser %}
-                <a href="{% url 'edit_ticket' ticket.id %}" class="btn deep-purple darken-1">Edit</a>
-                <a href="#modal-delete" class="btn modal-trigger red darken-4">Delete</a>
+                <a href="{% url 'edit_ticket' ticket.id %}"
+                    class="btn waves-effect waves-light deep-purple darken-1">Edit</a>
+                <a href="#modal-delete" class="btn modal-trigger waves-effect waves-light red darken-4">Delete</a>
                 {% endif %}
                 {% if user.is_authenticated %}
-                <a href="{% url 'create_comment' ticket.id %}" class="btn deep-purple darken-1">Add Comment</a>
+                <a href="{% url 'create_comment' ticket.id %}"
+                    class="btn waves-effect waves-light deep-purple darken-1">Add Comment</a>
                 {% endif %}
+                <form action="#" method="POST">
+                    {% csrf_token %}
+                    {% if user.id in voters %}
+                        <input type="submit" class="btn waves-effect waves-light red darken-4" value="Remove Vote" name="downvote">
+                    {% else %}
+                        <input type="submit" class="btn waves-effect waves-light success" value="Upvote!" name="upvote">
+                    {% endif %}
+                </form>
+                <br><br>
+                <p>Upvotes: {{ voters|length }}</p>
             </div>
         </div>
     </div>
@@ -40,7 +52,7 @@
 </div>
 
 {% for comment in comments %}
-    <p>{{ comment.comment_text }}</p>
+<p>{{ comment.comment_text }}</p>
 {% endfor %}
 
 {% endblock %}

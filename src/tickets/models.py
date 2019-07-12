@@ -70,3 +70,19 @@ class Comment(models.Model):
 
     def __str__(self):
         return "Comment {0} on Ticket {1}".format(self.id, self.ticket)
+
+
+class BugUpvote(models.Model):
+    ticket = models.ForeignKey(
+        Ticket,
+        on_delete=models.CASCADE,
+        null=True
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        null=True
+    )
+
+    def __str__(self):
+        return "BU#{0} on Ticket#{1}".format(self.id, self.ticket)

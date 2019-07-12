@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Ticket, Comment
+from .models import Ticket, Comment, BugUpvote
 
 
 class TicketForm(forms.ModelForm):
@@ -37,4 +37,12 @@ class CommentForm(forms.ModelForm):
         model = Comment
         fields = [
             "comment_text"
+        ]
+
+class BugVoteForm(forms.ModelForm):
+    class Meta:
+        model = BugUpvote
+        fields = [
+            "ticket",
+            "user"
         ]
