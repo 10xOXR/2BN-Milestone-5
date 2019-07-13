@@ -1,8 +1,9 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 
 {% load materializecss %}
 
-{% block page_title %}Raise a Ticket{% endblock %}
+{% block page_title %}New Feature{% endblock %}
 
 {% block content %}
 <div class="row">
@@ -10,16 +11,44 @@
         <div class="card">
             <div class="card-content">
                 <h2 class="center">Feature Request</h2>
-                <form method="post">
+                <h3 class="center">There is a €100 fee to make a feature request</h3>
+                <div id="credit-card-errors" style="display: none;">
+                    <div class="alert-message block-message error" id="stripe-error-message"></div>
+                </div>
+                <form id="feature-pay" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="row">
                         <div class="col s12">
-                            {{ new_ticket_form|materializecss }}
+                            {{ feature_form|materializecss }}
+                        </div>
+                    </div>
+                    <h5>Payment Details</h5>
+                    <div class="row">
+                        <div class="col s8">
+                            {{ payment_form.stripe_id }}
+                            <label for="credit_card_number">Credit Card Number</label>
+                            {{ payment_form.credit_card_number }}
+                        </div>
+                        <div class="col s4">
+                            <label for="cvv">CVV</label>
+                            {{ payment_form.cvv }}
                         </div>
                     </div>
                     <div class="row">
+                        <div class="col s12 m6">
+                            <label for="expiry_month">Month</label>
+                            {{ payment_form.expiry_month }}
+                        </div>
+                        <div class="col s12 m6">
+                            <label for="expiry_year">Year</label>
+                            {{ payment_form.expiry_year }}
+                        </div>
+                    </div>
+                    <br><br>
+                    <div class="row">
                         <div class="col s12 center">
-                            <button type="submit" class="btn deep-purple darken-1">Submit Ticket</button>
+                            <button type="submit" class="btn deep-purple darken-1">Submit & Pay</button>
+                            <a href="{% url 'all_tickets' %}" class="btn red darken-4">Cancel</a>
                         </div>
                     </div>
                 </form>
@@ -27,4 +56,14 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block page_js %}
+<script src="https://js.stripe.com/v2/"></script>
+<script>
+    //<![CDATA[
+    Stripe.publishableKey = '{{ publishable }}';
+    //]]>
+</script>
+<script src="{% static 'js/stripe.js' %}"></script>
 {% endblock %}

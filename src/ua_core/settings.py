@@ -128,6 +128,9 @@ MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"
 
 MATERIALIZECSS_ICON_SET = "fontawesome"
 
+STRIPE_PUBLISHABLE = os.getenv("STRIPE_PUBLISHABLE")
+STRIPE_SECRET = os.getenv("STRIPE_SECRET")
+
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = os.getenv("EMAIL_ADDRESS")

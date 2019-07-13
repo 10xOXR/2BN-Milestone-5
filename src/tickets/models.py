@@ -72,7 +72,7 @@ class Comment(models.Model):
         return "Comment {0} on Ticket {1}".format(self.id, self.ticket)
 
 
-class BugUpvote(models.Model):
+class Upvote(models.Model):
     ticket = models.ForeignKey(
         Ticket,
         on_delete=models.CASCADE,
