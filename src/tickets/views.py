@@ -2,45 +2,71 @@ from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .models import Ticket, Comment, BugUpvote
-from .forms import TicketForm, CommentForm, BugVoteForm
+from .models import Ticket, Comment, Upvote
+from .forms import TicketForm, CommentForm, PaymentForm
+from django.conf import settings
+import stripe
+
+stripe.api_key = settings.STRIPE_SECRET
 
 
 @login_required
 def new_bug(request):
     if request.method == "POST":
-        new_ticket_form = TicketForm(request.POST)
-        if new_ticket_form.is_valid():
-            new_ticket_form.instance.raised_by = request.user
-            new_ticket_form.instance.ticket_type = "Bug Report"
-            new_bug = new_ticket_form.save()
+        bug_form = TicketForm(request.POST)
+        if bug_form.is_valid():
+            bug_form.instance.raised_by = request.user
+            bug_form.instance.ticket_type = "Bug Report"
+            new_bug = bug_form.save()
             return redirect(ticket_detail, new_bug.pk)
     else:
-        new_ticket_form = TicketForm()
+        bug_form = TicketForm()
 
     return render(
         request,
         "new_bug.html",
-        {"new_ticket_form": new_ticket_form}
+        {"bug_form": bug_form}
     )
 
 
 @login_required
 def new_feature(request):
     if request.method == "POST":
-        new_ticket_form = TicketForm(request.POST)
-        if new_ticket_form.is_valid():
-            new_ticket_form.instance.raised_by = request.user
-            new_ticket_form.instance.ticket_type = "Feature Request"
-            new_feature = new_ticket_form.save()
-            return redirect(ticket_detail, new_feature.pk)
+        feature_form = TicketForm(request.POST)
+        payment_form = PaymentForm(request.POST)
+
+        if feature_form.is_valid() and payment_form.is_valid():
+            try:
+                customer = stripe.Charge.create(
+                    amount = int(100 * 100),
+                    currency = "EUR",
+                    description = request.user.email,
+                    card = payment_form.cleaned_data["stripe_id"],
+                )
+            except stripe.error.CardError:
+                messages.error(request, "Your card was declined!")
+
+            if customer.paid:
+                messages.success(request, "You have successfully paid!")
+                feature_form.instance.raised_by = request.user
+                feature_form.instance.ticket_type = "Feature Request"
+                new_feature = feature_form.save()
+                return redirect(ticket_detail, new_feature.pk)
+            else:
+                messages.error(request, "Unable to take payment!")
+        else:
+            print(payment_form.errors)
+            messages.error(request, "We were unable to take a payment with that card!")
     else:
-        new_ticket_form = TicketForm()
+        feature_form = TicketForm()
+        payment_form = PaymentForm()
 
     return render(
         request,
         "new_feature.html",
-        {"new_ticket_form": new_ticket_form}
+        {"feature_form": feature_form,
+        "payment_form": payment_form,
+        "publishable": settings.STRIPE_PUBLISHABLE}
     )
 
 
@@ -79,17 +105,9 @@ def create_comment(request, pk):
 def ticket_detail(request, pk):
     ticket = get_object_or_404(Ticket, pk=pk)
     comments = Comment.objects.filter(ticket_id=ticket.pk)
-    upvotes = BugUpvote.objects.filter(ticket_id=ticket.pk).values("user_id")
+    upvotes = Upvote.objects.filter(ticket_id=ticket.pk).values("user_id")
     voters = [vote["user_id"] for vote in upvotes]
-
-    if ticket.ticket_type == "Bug Report":
-        if request.POST.get("upvote"):
-            BugUpvote.objects.create(ticket_id=ticket.pk, user_id=request.user.id)
-            return redirect(ticket_detail, ticket.pk)
-
-        elif request.POST.get("downvote"):
-            BugUpvote.objects.filter(ticket_id=ticket.pk, user_id=request.user.id).delete()
-            return redirect(ticket_detail, ticket.pk)
+    payment_form = PaymentForm()
 
     return render(
         request,
@@ -98,7 +116,60 @@ def ticket_detail(request, pk):
             "ticket": ticket,
             "comments": comments,
             "voters": voters,
+            "payment_form": payment_form,
+            "publishable": settings.STRIPE_PUBLISHABLE
         }
+    )
+
+
+def upvote(request, pk):
+    ticket = get_object_or_404(Ticket, pk=pk)
+    if request.method == "POST":
+        payment_form = PaymentForm(request.POST)
+
+        if payment_form.is_valid():
+            try:
+                customer = stripe.Charge.create(
+                    amount = int(5 * 100),
+                    currency = "EUR",
+                    description = request.user.email,
+                    card = payment_form.cleaned_data["stripe_id"],
+                )
+            except stripe.error.CardError:
+                messages.error(request, "Your card was declined!")
+
+            if customer.paid:
+                messages.success(request, "You have successfully paid!")
+                Upvote.objects.create(
+                    ticket_id=ticket.pk,
+                    user_id=request.user.id
+                )
+                return redirect(ticket_detail, ticket.pk)
+            else:
+                messages.error(request, "Unable to take payment!")
+        else:
+            print(payment_form.errors)
+            messages.error(request, "We were unable to take a payment with that card!")
+    else:
+        Upvote.objects.create(
+            ticket_id=ticket.pk,
+            user_id=request.user.id
+        )
+        return redirect(
+            ticket_detail,
+            ticket.pk
+        )
+
+
+def downvote(request, pk):
+    ticket = get_object_or_404(Ticket, pk=pk)
+    Upvote.objects.filter(
+        ticket_id=ticket.pk,
+        user_id=request.user.id
+    ).delete()
+    return redirect(
+        ticket_detail,
+        ticket.pk
     )
 
 
