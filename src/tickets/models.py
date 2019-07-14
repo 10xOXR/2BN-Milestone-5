@@ -85,4 +85,4 @@ class Upvote(models.Model):
     )
 
     def __str__(self):
-        return "BU#{0} on Ticket#{1}".format(self.id, self.ticket)
+        return "Upvote #{0} on Ticket {1}".format(self.id, self.ticket)

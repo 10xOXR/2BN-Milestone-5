@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import Ticket, Comment, Upvote
-from .forms import TicketForm, CommentForm, PaymentForm
+from .forms import TicketForm, CommentForm
 from django.conf import settings
 import stripe
 
@@ -33,39 +33,38 @@ def new_bug(request):
 def new_feature(request):
     if request.method == "POST":
         feature_form = TicketForm(request.POST)
-        payment_form = PaymentForm(request.POST)
 
-        if feature_form.is_valid() and payment_form.is_valid():
+        if feature_form.is_valid():
             try:
+                token = request.POST["stripeToken"]
                 customer = stripe.Charge.create(
                     amount = int(100 * 100),
                     currency = "EUR",
-                    description = request.user.email,
-                    card = payment_form.cleaned_data["stripe_id"],
+                    description = (
+                        "Feature Request: "+\
+                            request.user.get_full_name() +\
+                            " (" + request.user.email + ")"),
+                    source=token,
                 )
+                if customer.paid:
+                    messages.success(request, "You have successfully paid!")
+                    feature_form.instance.raised_by = request.user
+                    feature_form.instance.ticket_type = "Feature Request"
+                    new_feature = feature_form.save()
+                    return redirect(ticket_detail, new_feature.pk)
+                else:
+                    messages.error(request, "Unable to take payment!")
             except stripe.error.CardError:
                 messages.error(request, "Your card was declined!")
-
-            if customer.paid:
-                messages.success(request, "You have successfully paid!")
-                feature_form.instance.raised_by = request.user
-                feature_form.instance.ticket_type = "Feature Request"
-                new_feature = feature_form.save()
-                return redirect(ticket_detail, new_feature.pk)
-            else:
-                messages.error(request, "Unable to take payment!")
         else:
-            print(payment_form.errors)
-            messages.error(request, "We were unable to take a payment with that card!")
+            messages.error(request, "Unable to take a payment with that card!")
     else:
         feature_form = TicketForm()
-        payment_form = PaymentForm()
 
     return render(
         request,
         "new_feature.html",
         {"feature_form": feature_form,
-        "payment_form": payment_form,
         "publishable": settings.STRIPE_PUBLISHABLE}
     )
 
@@ -107,7 +106,6 @@ def ticket_detail(request, pk):
     comments = Comment.objects.filter(ticket_id=ticket.pk)
     upvotes = Upvote.objects.filter(ticket_id=ticket.pk).values("user_id")
     voters = [vote["user_id"] for vote in upvotes]
-    payment_form = PaymentForm()
 
     return render(
         request,
@@ -116,7 +114,6 @@ def ticket_detail(request, pk):
             "ticket": ticket,
             "comments": comments,
             "voters": voters,
-            "payment_form": payment_form,
             "publishable": settings.STRIPE_PUBLISHABLE
         }
     )
@@ -125,19 +122,17 @@ def ticket_detail(request, pk):
 def upvote(request, pk):
     ticket = get_object_or_404(Ticket, pk=pk)
     if request.method == "POST":
-        payment_form = PaymentForm(request.POST)
-
-        if payment_form.is_valid():
-            try:
-                customer = stripe.Charge.create(
-                    amount = int(5 * 100),
-                    currency = "EUR",
-                    description = request.user.email,
-                    card = payment_form.cleaned_data["stripe_id"],
-                )
-            except stripe.error.CardError:
-                messages.error(request, "Your card was declined!")
-
+        try:
+            token = request.POST['stripeToken']
+            customer = stripe.Charge.create(
+                amount = int(5 * 100),
+                currency = "EUR",
+                description = (
+                    "Feature Upvote: "+\
+                        request.user.get_full_name() +\
+                        " (" + request.user.email + ")"),
+                source=token,
+            )
             if customer.paid:
                 messages.success(request, "You have successfully paid!")
                 Upvote.objects.create(
@@ -147,18 +142,17 @@ def upvote(request, pk):
                 return redirect(ticket_detail, ticket.pk)
             else:
                 messages.error(request, "Unable to take payment!")
-        else:
-            print(payment_form.errors)
-            messages.error(request, "We were unable to take a payment with that card!")
+        except stripe.error.CardError:
+            messages.error(request, "Your card was declined!")
     else:
         Upvote.objects.create(
             ticket_id=ticket.pk,
             user_id=request.user.id
         )
-        return redirect(
-            ticket_detail,
-            ticket.pk
-        )
+    return redirect(
+        ticket_detail,
+        ticket.pk
+    )
 
 
 def downvote(request, pk):

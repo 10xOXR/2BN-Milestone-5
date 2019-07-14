@@ -58,37 +58,18 @@
     <div class="modal-content">
         <h3 class="center">Upvote Feature</h3>
         <h4 class="center">There is a €5 fee to upvote a Feature</h4>
-        <form id="feature-pay" method="post" action="{% url 'upvote' ticket.id %}">
+        <form id="payment-form" method="post" action="{% url 'upvote' ticket.id %}" data-token="{{ publishable }}">
             {% csrf_token %}
             <h5>Payment Details</h5>
+            <!-- stripe element will be inserted in this div -->
             <div class="row">
-                <div class="col s8">
-                    {{ payment_form.stripe_id }}
-                    <label for="credit_card_number">Credit Card Number</label>
-                    {{ payment_form.credit_card_number }}
-                </div>
-                <div class="col s4">
-                    <label for="cvv">CVV</label>
-                    {{ payment_form.cvv }}
-                </div>
-            </div>
-            <div class="row">
-                <div class="col s12 m6">
-                    <label for="expiry_month">Month</label>
-                    {{ payment_form.expiry_month }}
-                </div>
-                <div class="col s12 m6">
-                    <label for="expiry_year">Year</label>
-                    {{ payment_form.expiry_year }}
-                </div>
+                <label for="card-element">Credit or Debit card</label>
+                <div id="card-element"></div>
+                <div id="card-errors" role="alert"></div>
             </div>
             <br><br>
-            <div class="row">
-                <div class="col s12 center">
-                    <button type="submit" class="btn deep-purple darken-1">Upvote & Pay</button>
-                    <a href="#" class="btn modal-close red darken-4">Cancel</a>
-                </div>
-            </div>
+            <button type="submit" class="btn deep-purple darken-1">Submit Payment</button>
+            <a href="{% url 'all_tickets' %}" class="btn red darken-4">Cancel</a>
         </form>
     </div>
 </div>
@@ -99,11 +80,6 @@
 {% endblock %}
 
 {% block page_js %}
-<script src="https://js.stripe.com/v2/"></script>
-<script>
-    //<![CDATA[
-    Stripe.publishableKey = '{{ publishable }}';
-    //]]>
-</script>
+<script src="https://js.stripe.com/v3/"></script>
 <script src="{% static 'js/stripe.js' %}"></script>
 {% endblock %}
