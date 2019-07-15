@@ -73,7 +73,7 @@ def all_tickets(request):
     tickets = Ticket.objects.filter(
         raised_on__lte=timezone.now()
         ).order_by('-raised_on')
-
+    
     return render(
         request,
         "tickets.html",

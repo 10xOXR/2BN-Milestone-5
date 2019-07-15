@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'materializecssform',
     'users',
     'tickets',
+    'charts',
 ]
 
 MIDDLEWARE = [
