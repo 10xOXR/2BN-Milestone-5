@@ -27,7 +27,8 @@
             <a href="{% url 'new_bug' %}" class="btn deep-purple darken-1">New Bug Report</a>
             <a href="{% url 'new_feature' %}" class="btn deep-purple darken-1">New Feature Request</a>
             {% else %}
-            <p>Please <a href="{% url 'login' %}">login</a> or <a href="{% url 'register' %}">register</a> to create a ticket!</p>
+            <p>Please <a href="{% url 'login' %}">login</a> or <a href="{% url 'register' %}">register</a> to create a
+                ticket!</p>
             {% endif %}
         </div>
     </div>
