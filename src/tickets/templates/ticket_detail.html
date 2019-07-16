@@ -75,7 +75,7 @@
 </div>
 
 {% for comment in comments %}
-<p>{{ comment.comment_text }}</p>
+<p>{{ comment.comment_text|linebreaksbr }}</p>
 {% endfor %}
 {% endblock %}
 
