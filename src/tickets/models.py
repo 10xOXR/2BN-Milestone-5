@@ -38,6 +38,9 @@ class Ticket(models.Model):
     upvotes = models.IntegerField(
         default=0
     )
+    views = models.IntegerField(
+        default=0
+    )
     status = models.CharField(
         max_length=20,
         choices=TICKET_STATUS,
