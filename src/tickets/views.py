@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, reverse, get_object_or_404
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -70,10 +71,19 @@ def new_feature(request):
 
 
 def all_tickets(request):
-    tickets = Ticket.objects.filter(
-        raised_on__lte=timezone.now()
-        ).order_by('-raised_on')
-    
+    # tickets = Ticket.objects.filter(
+    #     raised_on__lte=timezone.now()
+    #     ).order_by('-raised_on')
+    tickets = Ticket.objects.all()
+    page = request.GET.get("page", 1)
+    paginator = Paginator(tickets, 4)
+    try:
+        tickets = paginator.page(page)
+    except PageNotAnInteger:
+        tickets = paginator.page(1)
+    except EmptyPage:
+        tickets = paginator.page(paginator.num_pages)
+
     return render(
         request,
         "tickets.html",
