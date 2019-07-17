@@ -18,6 +18,7 @@
                 <p><strong>Description:</strong> {{ ticket.description|linebreaksbr }}</p>
                 <p><strong>Created:</strong> {{ ticket.raised_on }}</p>
                 <p><strong>Last Updated:</strong> {{ ticket.last_updated }}</p>
+                <p><strong>Views:</strong> {{ ticket.views }}</p>
                 <a href="{% url 'all_tickets' %}" class="btn waves-effect waves-light deep-purple darken-1">Go back</a>
                 {% if user.id == ticket.raised_by.id or user.is_superuser %}
                     <a href="{% url 'edit_ticket' ticket.id %}"
@@ -39,7 +40,7 @@
                     {% endif %}
                 {% endif %}
                 <br><br>
-                <p>Upvotes: {{ voters|length }}</p>
+                <p>Upvotes: {{ ticket.upvotes }}</p>
             </div>
         </div>
     </div>

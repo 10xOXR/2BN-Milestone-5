@@ -103,6 +103,8 @@ def create_comment(request, pk):
 
 def ticket_detail(request, pk):
     ticket = get_object_or_404(Ticket, pk=pk)
+    ticket.views += 1
+    ticket.save()
     comments = Comment.objects.filter(ticket_id=ticket.pk)
     upvotes = Upvote.objects.filter(ticket_id=ticket.pk).values("user_id")
     voters = [vote["user_id"] for vote in upvotes]
@@ -119,8 +121,12 @@ def ticket_detail(request, pk):
     )
 
 
+@login_required
 def upvote(request, pk):
     ticket = get_object_or_404(Ticket, pk=pk)
+    ticket.upvotes += 1
+    ticket.views -= 1
+    ticket.save()
     if request.method == "POST":
         try:
             token = request.POST['stripeToken']
@@ -155,8 +161,12 @@ def upvote(request, pk):
     )
 
 
+@login_required
 def downvote(request, pk):
     ticket = get_object_or_404(Ticket, pk=pk)
+    ticket.upvotes -= 1
+    ticket.views -= 1
+    ticket.save()
     Upvote.objects.filter(
         ticket_id=ticket.pk,
         user_id=request.user.id

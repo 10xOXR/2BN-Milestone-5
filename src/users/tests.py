@@ -9,7 +9,6 @@ from .forms import (
 )
 
 
-
 class TestUserLoginForm(TestCase):
     def test_login_form_valid(self):
         form = UserLoginForm(
