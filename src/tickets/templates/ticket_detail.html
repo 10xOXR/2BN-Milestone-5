@@ -19,7 +19,13 @@
                 <p><strong>Created:</strong> {{ ticket.raised_on }}</p>
                 <p><strong>Last Updated:</strong> {{ ticket.last_updated }}</p>
                 <p><strong>Views:</strong> {{ ticket.views }}</p>
-                <a href="{% url 'all_tickets' %}" class="btn waves-effect waves-light deep-purple darken-1">Go back</a>
+                {% if "new" in previous  %}
+                    <a href="{% url 'all_tickets' %}" class="btn waves-effect waves-light deep-purple darken-1">Go back</a>
+                {% elif "edit" in previous %}
+                    <a href="{% url 'all_tickets' %}?{{ args }}" class="btn waves-effect waves-light deep-purple darken-1">Go back</a>
+                {% else %}
+                    <a href="javascript:history.back();" class="btn waves-effect waves-light deep-purple darken-1">Go back</a>
+                {% endif %}
                 {% if user.id == ticket.raised_by.id or user.is_superuser %}
                     <a href="{% url 'edit_ticket' ticket.id %}"
                         class="btn waves-effect waves-light deep-purple darken-1">Edit</a>

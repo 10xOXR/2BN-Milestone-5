@@ -3,11 +3,42 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 
 
-TICKET_STATUS = (
-    ("To-Do (Not Started)", "To-Do (Not Started)"),
-    ("In Progress", "In Progress"),
-    ("Completed", "Completed")
-)
+class TicketStatus(models.Model):
+    TICKET_STATUS_OPTIONS = (
+        ("To-Do (Not Started)", "To-Do (Not Started)"),
+        ("In Progress", "In Progress"),
+        ("Completed", "Completed")
+    )
+    ticket_status = models.CharField(
+        max_length=20,
+        choices=TICKET_STATUS_OPTIONS
+    )
+
+    class Meta:
+        verbose_name=("Ticket Status")
+        verbose_name_plural=("Ticket Status")
+
+    def __str__(self):
+        return self.ticket_status
+
+
+class TicketType(models.Model):
+    TICKET_STATUS_OPTIONS = (
+        ("Bug Request", "Bug Request"),
+        ("Feature Request", "Feature Request")
+    )
+    ticket_type = models.CharField(
+        max_length=15,
+        choices=TICKET_STATUS_OPTIONS
+    )
+
+    class Meta:
+        verbose_name=("Ticket Type")
+        verbose_name_plural=("Ticket Types")
+
+    def __str__(self):
+        return self.ticket_type
+
 
 class Ticket(models.Model):
     """ Structure of a Bug Ticket """
@@ -15,10 +46,9 @@ class Ticket(models.Model):
         max_length=50,
         blank=False
     )
-    ticket_type = models.CharField(
-        max_length=20,
-        blank=False,
-        null=True
+    ticket_type = models.ForeignKey(
+        TicketType,
+        null=False
     )
     description = models.TextField(
         max_length=1000,
@@ -41,10 +71,9 @@ class Ticket(models.Model):
     views = models.IntegerField(
         default=0
     )
-    status = models.CharField(
-        max_length=20,
-        choices=TICKET_STATUS,
-        default="To-Do (Not Started)"
+    status = models.ForeignKey(
+        TicketStatus,
+        default="1"
     )
 
     def __str__(self):

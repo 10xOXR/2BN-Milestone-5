@@ -2,17 +2,18 @@ from django.shortcuts import render
 from datetime import date, timedelta
 from django.utils import timezone
 from tickets.models import Ticket
+import pytz
 
 def charts(request):
-    bugs_count = Ticket.objects.filter(ticket_type="Bug Report").count()
-    features_count = Ticket.objects.filter(ticket_type="Feature Request").count()
-    todo_count = Ticket.objects.filter(status="To-Do (Not Started)").count()
-    in_progress_count = Ticket.objects.filter(status="In Progress").count()
-    completed_count = Ticket.objects.filter(status="Completed").count()
+    bugs_count = Ticket.objects.filter(ticket_type_id=1).count()
+    features_count = Ticket.objects.filter(ticket_type_id=2).count()
+    todo_count = Ticket.objects.filter(status_id=1).count()
+    in_progress_count = Ticket.objects.filter(status_id=2).count()
+    completed_count = Ticket.objects.filter(status_id=3).count()
 
     # Date range for bugs/features updated daily/weekl/monthly
-    startdate = date.today() - timedelta(days=30)
-    enddate = date.today()
+    startdate = timezone.now() - timedelta(days=30)
+    enddate = timezone.now()
     updated_tickets = Ticket.objects.filter(last_updated__range=[startdate, enddate]).count()
     weekly_updated = updated_tickets / 4
     daily_updated = updated_tickets / 30
