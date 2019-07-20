@@ -3,12 +3,45 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .models import Ticket, Comment, Upvote
+from .models import Ticket, Comment, Upvote, TicketStatus, TicketType
 from .forms import TicketForm, CommentForm
 from django.conf import settings
 import stripe
+from urllib.parse import urlparse
 
 stripe.api_key = settings.STRIPE_SECRET
+
+
+def all_tickets(request):
+    page = request.GET.get("page", 1)
+    ticket_status_list = TicketStatus.objects.all()
+    ticket_type_list = TicketType.objects.all()
+    tkt_status = request.GET.get("tkt_status")
+    tkt_type = request.GET.get("tkt_type")
+    tickets = Ticket.objects.all()
+    tickets = tickets.filter(status__id=tkt_status) if tkt_status else tickets
+    tickets = tickets.filter(ticket_type__id=tkt_type) if tkt_type else tickets
+
+    paginator = Paginator(tickets, 4)
+    try:
+        tickets = paginator.page(page)
+    except PageNotAnInteger:
+        tickets = paginator.page(1)
+    except EmptyPage:
+        tickets = paginator.page(paginator.num_pages)
+
+    context = {
+        "tickets": tickets,
+        "ticket_status_list": ticket_status_list,
+        "ticket_type_list": ticket_type_list,
+        "tkt_status": tkt_status,
+        "tkt_type": tkt_type,
+    }
+    return render(
+        request,
+        "tickets.html",
+        context
+    )
 
 
 @login_required
@@ -17,16 +50,20 @@ def new_bug(request):
         bug_form = TicketForm(request.POST)
         if bug_form.is_valid():
             bug_form.instance.raised_by = request.user
-            bug_form.instance.ticket_type = "Bug Report"
+            bug_form.instance.ticket_type_id = "1"
+            bug_form.instance.status_id = "1"
             new_bug = bug_form.save()
             return redirect(ticket_detail, new_bug.pk)
     else:
         bug_form = TicketForm()
 
+    context = {
+        "bug_form": bug_form
+    }
     return render(
         request,
         "new_bug.html",
-        {"bug_form": bug_form}
+        context
     )
 
 
@@ -50,7 +87,8 @@ def new_feature(request):
                 if customer.paid:
                     messages.success(request, "You have successfully paid!")
                     feature_form.instance.raised_by = request.user
-                    feature_form.instance.ticket_type = "Feature Request"
+                    feature_form.instance.ticket_type_id = "2"
+                    feature_form.instance.status_id = "1"
                     new_feature = feature_form.save()
                     return redirect(ticket_detail, new_feature.pk)
                 else:
@@ -62,32 +100,14 @@ def new_feature(request):
     else:
         feature_form = TicketForm()
 
+    context = {
+        "feature_form": feature_form,
+        "publishable": settings.STRIPE_PUBLISHABLE
+    }
     return render(
         request,
         "new_feature.html",
-        {"feature_form": feature_form,
-        "publishable": settings.STRIPE_PUBLISHABLE}
-    )
-
-
-def all_tickets(request):
-    # tickets = Ticket.objects.filter(
-    #     raised_on__lte=timezone.now()
-    #     ).order_by('-raised_on')
-    tickets = Ticket.objects.all()
-    page = request.GET.get("page", 1)
-    paginator = Paginator(tickets, 4)
-    try:
-        tickets = paginator.page(page)
-    except PageNotAnInteger:
-        tickets = paginator.page(1)
-    except EmptyPage:
-        tickets = paginator.page(paginator.num_pages)
-
-    return render(
-        request,
-        "tickets.html",
-        {"tickets": tickets}
+        context
     )
 
 
@@ -104,10 +124,13 @@ def create_comment(request, pk):
     else:
         new_comment = CommentForm()
 
+    context = {
+        "new_comment": new_comment
+    }
     return render(
         request,
         "create_comment.html",
-        {"new_comment": new_comment}
+        context
     )
 
 
@@ -118,16 +141,26 @@ def ticket_detail(request, pk):
     comments = Comment.objects.filter(ticket_id=ticket.pk)
     upvotes = Upvote.objects.filter(ticket_id=ticket.pk).values("user_id")
     voters = [vote["user_id"] for vote in upvotes]
+    previous = request.META.get('HTTP_REFERER')
+    restore_args = None
+    if "edit" in previous or "new" in previous:
+        restore_args = request.session.get('prev_args')
+    else:
+        parsed = urlparse(previous).query
+        request.session['prev_args'] = parsed
 
+    context = {
+        "ticket": ticket,
+        "comments": comments,
+        "voters": voters,
+        "publishable": settings.STRIPE_PUBLISHABLE,
+        "previous": previous,
+        "args": restore_args
+    }
     return render(
         request,
         "ticket_detail.html",
-        {
-            "ticket": ticket,
-            "comments": comments,
-            "voters": voters,
-            "publishable": settings.STRIPE_PUBLISHABLE
-        }
+        context
     )
 
 
@@ -199,10 +232,13 @@ def edit_ticket(request, pk):
     else:
         edit_ticket = TicketForm(instance=ticket)
 
+    context = {
+        "edit_ticket": edit_ticket
+    }
     return render(
         request,
         "edit_ticket.html",
-        {"edit_ticket": edit_ticket}
+        context
     )
 
 

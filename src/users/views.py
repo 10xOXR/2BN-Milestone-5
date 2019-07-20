@@ -46,11 +46,21 @@ def login(request):
                 messages.success(request, "You have logged in successfully.")
                 return redirect(reverse("profile"))
             else:
-                messages.error(request, "Your username or password is incorrect.")
+                messages.error(
+                    request,
+                    "Your username or password is incorrect."
+                )
     else:
         login_form = UserLoginForm()
 
-    return render(request, "login.html", {"login_form": login_form})
+    context = {
+        "login_form": login_form
+    }
+    return render(
+        request,
+        "login.html",
+        context
+    )
 
 
 def registration(request):
@@ -80,9 +90,14 @@ def registration(request):
     else:
         registration_form = UserRegistrationForm()
 
+    context = {
+        "registration_form": registration_form
+    }
     return render(
-        request, "registration.html",
-        {"registration_form": registration_form})
+        request,
+        "registration.html",
+        context
+    )
 
 
 @login_required
@@ -112,4 +127,8 @@ def profile(request):
         "profile_form": profile_form,
         "profile": user
     }
-    return render(request, "profile.html", context)
+    return render(
+        request,
+        "profile.html",
+        context
+    )
