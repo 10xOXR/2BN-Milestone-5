@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% load materializecss %}
+
+{% block page_title %}Statistics{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col s12 m6 card">
+        <canvas id="bugsVsFeatures" height="200"></canvas>
+    </div>
+    <div class="col s12 m6 card">
+        <canvas id="status" height="200"></canvas>
+    </div>
+</div>
+<div class="row">
+    <div class="col s12 m6 card">
+        <canvas id="updatedTickets" width="200" height="200"></canvas>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_js %}
+
+<script>
+    var bugs_count = {{ bugs_count|safe }};
+    var features_count = {{ features_count|safe }};
+
+    new Chart(document.getElementById('bugsVsFeatures'), {
+        type: 'pie',
+        data: {
+            labels: ['Bug Reports', 'Feature Requests'],
+            datasets: [{
+                label: 'Bugs vs Features',
+                data: [bugs_count, features_count],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)'
+                ],
+                borderWidth: 1
+            }]
+        }
+    });
+
+    var todo_count = {{ todo_count|safe }};
+    var in_progress_count = {{ in_progress_count|safe }};
+    var completed_count = {{ completed_count|safe }};
+
+    new Chart(document.getElementById('status'), {
+        type: 'pie',
+        data: {
+            labels: ['To-Do', 'In Progress', 'Completed'],
+            datasets: [{
+                label: 'Ticket Status',
+                data: [todo_count, in_progress_count, completed_count],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)'
+                ],
+                borderWidth: 1
+            }]
+        }
+    });
+
+    var daily_updated = {{ daily_updated|safe }};
+    var weekly_updated = {{ weekly_updated|safe }};
+    var updated_tickets = {{ updated_tickets|safe }};
+
+    new Chart(document.getElementById('updatedTickets'), {
+        type: 'bar',
+        data: {
+            labels: ['Daily', 'Weekly', 'Monthly'],
+            datasets: [{
+                label: 'Update Frequency',
+                data: [daily_updated, weekly_updated, updated_tickets],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+
+</script>
+
+{% endblock %}

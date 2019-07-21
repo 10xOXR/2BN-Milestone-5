@@ -1,0 +1,31 @@
+<ul class="pagination center-align">
+    {% if tickets.has_previous %}
+    <li>
+        <a href="?page=1"{{ get_args }}><<</a>
+    </li>
+    <li>
+        <a href="?page={{ tickets.previous_page_number }}{{ get_args }}"><</a>
+    </li>
+    {% endif %}
+
+    {% for num in tickets.paginator.page_range %}
+        {% if tickets.number == num %}
+            <li class="active disabled deep-purple darken-1">
+                <a class="white-text">{{ num }}</a>
+            </li>
+        {% elif num > tickets.number|add:'-3' and num < tickets.number|add:'3' %}
+            <li>
+                <a href="?page={{ num }}{{ get_args }}">{{ num }}</a>
+            </li>
+        {% endif %}
+    {% endfor %}
+
+    {% if tickets.has_next %}
+    <li>
+        <a href="?page={{ tickets.next_page_number }}{{ get_args }}">></a>
+    </li>
+    <li>
+        <a href="?page={{ tickets.paginator.num_pages }}{{ get_args }}">>></a>
+    </li>
+    {% endif %}
+</ul>

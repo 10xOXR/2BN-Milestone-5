@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% load materializecss %}
+
+{% block page_title %}Ticket Detail{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col s12">
+        <div class="card">
+            <div class="card-content">
+                <h2 class="center">Ticket Detail</h2>
+                <p><strong>Title:</strong> {{ ticket.title }}</p>
+                <p><strong>Type:</strong> {{ ticket.ticket_type }}</p>
+                <p><strong>Raised By:</strong> {{ ticket.raised_by }}</p>
+                <p><strong>Status:</strong> {{ ticket.status }}</p>
+                <p><strong>Description:</strong> {{ ticket.description|linebreaksbr }}</p>
+                <p><strong>Created:</strong> {{ ticket.raised_on }}</p>
+                <p><strong>Last Updated:</strong> {{ ticket.last_updated }}</p>
+                <p><strong>Views:</strong> {{ ticket.views }}</p>
+                {% if "new" in previous  %}
+                    <a href="{% url 'all_tickets' %}" class="btn waves-effect waves-light deep-purple darken-1">Go back</a>
+                {% elif "edit" in previous %}
+                    <a href="{% url 'all_tickets' %}?{{ args }}" class="btn waves-effect waves-light deep-purple darken-1">Go back</a>
+                {% else %}
+                    <a href="javascript:history.back();" class="btn waves-effect waves-light deep-purple darken-1">Go back</a>
+                {% endif %}
+                {% if user.id == ticket.raised_by.id or user.is_superuser %}
+                    <a href="{% url 'edit_ticket' ticket.id %}"
+                        class="btn waves-effect waves-light deep-purple darken-1">Edit</a>
+                    <a href="#modal-delete" class="btn modal-trigger waves-effect waves-light red darken-4">Delete</a>
+                    {% endif %}
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'create_comment' ticket.id %}"
+                            class="btn waves-effect waves-light deep-purple darken-1">Add Comment</a>
+                        {% if user.id in voters %}
+                            <a href="{% url 'downvote' ticket.id %}" class="btn waves-effect waves-light red darken-4">Remove
+                                Vote</a>
+                        {% else %}
+                            {% if ticket.ticket_type == "Feature Request" %}
+                                <a href="#modal-feature-upvote" class="btn modal-trigger waves-effect waves-light success">Upvote</a>
+                            {% else %}
+                                <a href="{% url 'upvote' ticket.id %}" class="btn waves-effect waves-light success">Upvote</a>
+                            {% endif %}
+                    {% endif %}
+                {% endif %}
+                <br><br>
+                <p>Upvotes: {{ ticket.upvotes }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modal-delete" class="modal">
+    <div class="modal-content center-align">
+        <h3>Delete Ticket</h3>
+        <p class="center">Are you Sure? This cannot be undone!</p>
+        <a href="{% url 'delete_ticket' ticket.id %}" class="btn red darken-4">Confirm</a>
+        <a href="#" class="btn modal-close success">Cancel</a>
+    </div>
+</div>
+
+<div id="modal-feature-upvote" class="modal">
+    <div class="modal-content">
+        <h3 class="center">Upvote Feature</h3>
+        <h4 class="center">There is a €5 fee to upvote a Feature</h4>
+        <form id="payment-form" method="post" action="{% url 'upvote' ticket.id %}" data-token="{{ publishable }}">
+            {% csrf_token %}
+            <h5>Payment Details</h5>
+            <!-- stripe element will be inserted in this div -->
+            <div class="row">
+                <label for="card-element">Credit or Debit card</label>
+                <div id="card-element"></div>
+                <div id="card-errors" role="alert"></div>
+            </div>
+            <br><br>
+            <button type="submit" class="btn deep-purple darken-1">Submit Payment</button>
+            <a href="#" class="btn modal-close red darken-4">Cancel</a>
+        </form>
+    </div>
+</div>
+
+{% for comment in comments %}
+<p>{{ comment.comment_text|linebreaksbr }}</p>
+{% endfor %}
+{% endblock %}
+
+{% block page_js %}
+<script src="https://js.stripe.com/v3/"></script>
+<script src="{% static 'js/stripe.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load materializecss %}
+
+{% block page_title %}Registration Page{% endblock %}
+
+{% block styles %}
+<style>
+    body {
+        background: url("{% static 'img/purple-bg.jpg' %}") no-repeat center center fixed;
+        background-size: cover;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <p>If you already have an account then please <a href="{% url 'login' %}">sign in</a>.</p>
+
+    <form method="post">
+        {% csrf_token %}
+
+        {{ registration_form | materializecss }}
+        <button type="submit" class="btn">Register</button>
+    </form>
+</div>
+{% endblock %}

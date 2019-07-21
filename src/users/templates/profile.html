@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% load materializecss %}
+
+{% block page_title %}{{ user.first_name }}'s Profile{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col s12">
+        <div class="card">
+            <div class="card-content">
+                <div class="row">
+                    <div class="col s12 m4">
+                        <img src="{{ user.profile.image.url }}" alt="Profile Picture"
+                            class="rounded-circle account-img">
+                    </div>
+                    <div class="col s12 m8">
+                        <div class="row">
+                            <div class="col s12">
+                                <h4>{{ user.username }}'s Profile</h4>
+                            </div>
+                            <div class="col s12">
+                                <small>Email:</small>
+                                {{ user.email }}</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s6">
+                                <small>Name:</small>
+                                {{ user.get_full_name }}
+                            </div>
+                            <div class="col s6">
+                                <small>Username:</small>
+                                {{ user.username }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-action center-align">
+                <a href="#modal-edit-profile" class="btn modal-trigger deep-purple darken-1">Edit Profile</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modal-edit-profile" class="modal">
+    <div class="modal-content center-align">
+        <h3>Edit Profile</h3>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col s12 m6">
+                    {{ user_form.first_name|materializecss }}
+                </div>
+                <div class="col s12 m6">
+                    {{ user_form.last_name|materializecss }}
+                </div>
+                <div class="col s12 m6">
+                    {{ user_form.email|materializecss }}
+                </div>
+                <div class="col s12 m6">
+                    {{ profile_form.image }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s12 m6 offset-m3">
+                    <button type="submit" class="btn deep-purple darken-1">Update</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
