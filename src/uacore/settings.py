@@ -8,6 +8,7 @@ if os.path.exists("env.py"):
     DEBUG = True
 else:
     DEBUG = False
+    #STATICFILES_STORAGE = 'custom_storages.StaticStorage'
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -170,10 +171,3 @@ EMAIL_PORT = 587
 # Override default persistant login
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-
-DJANGORESIZED_DEFAULT_SIZE = [1920, 1080]
-DJANGORESIZED_DEFAULT_QUALITY = 75
-DJANGORESIZED_DEFAULT_KEEP_META = True
-DJANGORESIZED_DEFAULT_FORCE_FORMAT = 'JPEG'
-DJANGORESIZED_DEFAULT_FORMAT_EXTENSIONS = {'JPEG': ".jpg"}
-DJANGORESIZED_DEFAULT_NORMALIZE_ROTATION = True

@@ -1,10 +1,10 @@
 {% load staticfiles %}
 <nav class="nav-extended deep-purple darken-1">
-    <div class="nav-wrapper">
+    <div class="nav-wrapper font-baloo">
         <a href="#" data-target="mobile-demo" class="sidenav-trigger button-collapse show-on-large">
             <i class="fas fa-bars material-icons"></i>
         </a>
-        <a href="{% url 'index' %}" class="brand-logo center">
+        <a href="{% url 'index' %}" class="brand-logo center text-shadow">
             <img src="{% static 'img/unicorn-xs.png' %}" alt="unicorn-image" class="hide-on-small-and-down">
             Unicorn Attractor
         </a>
@@ -14,14 +14,14 @@
             <div class="row">
                 {% if user.is_authenticated %}
                 <div class="col s4">
-                    <img src="{{ user.profile.image.url }}" width="48px" height="48px" alt="avatar"
-                        class="circle responsive-img valign profile-image">
+                    <img src="{{ user.profile.image.url }}" width="48" height="48" alt="{{ user.username }}"
+                        class="circle">
                 </div>
                 <p>Hello, {{ user.get_full_name }}!</p>
                 {% else %}
                 <div class="col s4">
-                    <img src="{% static 'img/default.jpg' %}" width="48px" height="48px" alt="avatar"
-                        class="circle responsive-img valign profile-image">
+                    <img src="{% static 'img/default.jpg' %}" width="48" height="48" alt="Guest"
+                        class="circle">
                 </div>
                 <p>Hello, Guest!</p>
                 {% endif %}

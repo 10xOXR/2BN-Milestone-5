@@ -76,6 +76,9 @@ class Ticket(models.Model):
         default="1"
     )
 
+    class Meta:
+        ordering = ("-last_updated", )
+
     def __str__(self):
         return "#{0} [{1}] - {2}".format(self.id, self.ticket_type, self.title)
 

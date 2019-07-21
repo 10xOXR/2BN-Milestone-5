@@ -15,7 +15,6 @@ urlpatterns = [
     url(r'^tickets/', include(urls_tickets)),
     url(r'^charts/', include(urls_charts)),
 ]
-urlpatterns += static(settings.MEDIA_URL)
 
 if settings.DEBUG:
     urlpatterns += static(

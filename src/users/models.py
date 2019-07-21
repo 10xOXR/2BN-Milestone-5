@@ -37,9 +37,8 @@ class Profile(models.Model):
 
         if i_width > 300:
             buffer = BytesIO()
-            thumbnail_image = Image.open(self.image)
             thumbnail_image.thumbnail(max_size, Image.ANTIALIAS)
-            filename_suffix = Path(self.image.file.name).name[-3:].lower()
+            filename_suffix = thumbnail_image.format.lower()
             image_format = image_types[filename_suffix]
             thumbnail_image.save(buffer, format=image_format)
             file_object = File(buffer)
