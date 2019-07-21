@@ -23,6 +23,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='ticket',
             name='status',
-            field=models.ForeignKey(default='To-Do (Not Started)', on_delete=django.db.models.deletion.CASCADE, to='tickets.TicketStatus'),
+            field=models.ForeignKey(default='1', on_delete=django.db.models.deletion.CASCADE, to='tickets.TicketStatus'),
         ),
     ]
