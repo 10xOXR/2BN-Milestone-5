@@ -1,38 +1,45 @@
 <div class="container">
     <div class="row">
-        <div class="col s12 m10 offset-m1 l6 offset-l3">
-            <div class="card pink lighten-5 center-align">
+        <div class="col s12 m10 offset-m1 l6 offset-l3 card-border">
+            <div class="card center-align">
                 <ul class="pagination center-align">
                     {% if tickets.has_previous %}
                     <li>
-                        <a href="?page=1" {{ get_args }}><i class="fas fa-angle-double-left white-text text-outline"></i></a>
+                        <a href="?page=1" {{ get_args }}>
+                            <i class="fas fa-angle-double-left purple-text text-darken-3 text-outline"></i>
+                        </a>
                     </li>
                     <li>
-                        <a href="?page={{ tickets.previous_page_number }}{{ get_args }}"><i
-                                class="fas fa-angle-left white-text text-outline"></i></a>
+                        <a href="?page={{ tickets.previous_page_number }}{{ get_args }}">
+                            <i class="fas fa-angle-left purple-text text-outline"></i>
+                        </a>
                     </li>
                     {% endif %}
 
                     {% for num in tickets.paginator.page_range %}
                     {% if tickets.number == num %}
-                    <li class="active disabled deep-purple darken-1">
+                    <li class="active disabled indigo accent-3">
                         <a class="white-text text-outline">{{ num }}</a>
                     </li>
                     {% elif num > tickets.number|add:'-3' and num < tickets.number|add:'3' %}
                     <li>
-                        <a class="white-text text-outline" href="?page={{ num }}{{ get_args }}">{{ num }}</a>
+                        <a class="white-text text-outline" href="?page={{ num }}{{ get_args }}">
+                            {{ num }}
+                        </a>
                     </li>
                     {% endif %}
                     {% endfor %}
 
                     {% if tickets.has_next %}
                     <li>
-                        <a href="?page={{ tickets.next_page_number }}{{ get_args }}"><i
-                                class="fas fa-angle-right white-text text-outline"></i></a>
+                        <a href="?page={{ tickets.next_page_number }}{{ get_args }}">
+                            <i class="fas fa-angle-right purple-text text-outline"></i>
+                        </a>
                     </li>
                     <li>
-                        <a href="?page={{ tickets.paginator.num_pages }}{{ get_args }}"><i
-                                class="fas fa-angle-double-right white-text text-outline"></i></a>
+                        <a href="?page={{ tickets.paginator.num_pages }}{{ get_args }}">
+                            <i class="fas fa-angle-double-right purple-text text-darken-3 text-outline"></i>
+                        </a>
                     </li>
                     {% endif %}
                 </ul>
