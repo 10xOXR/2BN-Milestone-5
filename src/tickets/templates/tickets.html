@@ -13,86 +13,138 @@
 {% endblock %}
 
 {% block content %}
-<h1 class="center-align font-baloo text-shadow white-text">Tickets</h1>
-<form action="." method="GET" class="form">
-    <div class="card pink lighten-5 center-align">
-        <div class="row valign-wrapper">
-            <div class="col s12 m3 offset-m1 input-field">
-                <select name="tkt_status" id="tkt_status" class="browser-default border">
-                    <option value="">Filter by Status</option>
-                    {% for status in ticket_status_list %}
-                    <option value="{{ status.id }}" {% if status.id|safe in tkt_status|safe %}selected{% endif %}>
-                        {{ status }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col s12 m3 input-field">
-                <select name="tkt_type" id="tkt_type" class="browser-default border">
-                    <option value="">Filter by Type</option>
-                    {% for type in ticket_type_list %}
-                    <option value="{{ type.id }}" {% if type.id|safe in tkt_type|safe %}selected{% endif %}>{{ type }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col s12 m2 input-field">
-                <button type="submit" class="btn deep-purple darken-1">Search</button>
-            </div>
-            <div class="col s12 m2 input-field">
-                <a class="btn deep-purple darken-1" href="{% url 'all_tickets' %}">Reset</a>
-            </div>
+<div class="container">
+    <div class="row">
+        <div class="col s12 m8 offset-m2 l6 offset-l3">
+            <h1 id="h1-large" class="center-align font-baloo white-text card-border text-shadow">
+                Tickets
+            </h1>
         </div>
     </div>
-</form>
-<div class="row">
-    <div class="col s12 center-align">
-        {% if user.is_authenticated %}
-        <a href="{% url 'new_bug' %}" class="btn deep-purple darken-1">New Bug Report</a>
-        <a href="{% url 'new_feature' %}" class="btn deep-purple darken-1">New Feature Request</a>
-        {% else %}
-        <p>Please <a href="{% url 'login' %}">login</a> or <a href="{% url 'register' %}">register</a> to create
-            a
-            ticket!</p>
-        {% endif %}
-    </div>
-</div>
-<div class="row">
-    {% for ticket in tickets %}
-    <a href="{% url 'ticket_detail' ticket.id %}">
-        <div id="tickets" class="col s12 m6">
-            <div class="card hoverable">
-                <div class="card-content">
-                    <p id="tkt-title" class="center-align site-purple-text truncate">
-                        {% if ticket.ticket_type_id == 2 %}
-                        <i class="fas fa-code-branch"></i>
-                        {% else %}
-                        <i class="fas fa-bug prefix"></i>
-                        {% endif %}
-                        {{ ticket.title }}
-                    </p>
-                    <div class="divider "></div>
-                    <br>
-                    <div class="row">
-                        <p class="col s12 center-align large-text"><i class="fas fa-wrench site-purple-text"></i> {{ ticket.status }}</p>
-                    </div>
-                    <br>
-                    <p class="truncate large-text"><i class="fas fa-comment-dots site-purple-text"></i> {{ ticket.description }}</p>
+
+    <!-- filter tickets -->
+    <form action="." method="GET" class="form card-border">
+        <div class="card center-align">
+            <div class="row">
+                <!-- by ticket status -->
+                <div class="col s12 m6 l4 input-field">
+                    <select name="tkt_status" id="tkt_status" class="browser-default border">
+                        <option value="">Filter by Status</option>
+                        {% for status in ticket_status_list %}
+                        <option value="{{ status.id }}" {% if status.id|safe in tkt_status|safe %}selected{% endif %}>
+                            {{ status }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
-                <div id="tkt-footer" class="card-action">
-                    <div class="row">
-                        <div class="col s6">
-                            <p class="center-align white-text"><i class="fas fa-eye"></i> {{ ticket.views }}</p>
-                        </div>
-                        <div class="col s6">
-                            <p class="center-align white-text"><i class="fas fa-thumbs-up"></i> {{ ticket.upvotes }}</p>
-                        </div>
-                    </div>
+                <!-- by ticket type -->
+                <div class="col s12 m6 l4 input-field">
+                    <select name="tkt_type" id="tkt_type" class="browser-default border">
+                        <option value="">Filter by Type</option>
+                        {% for type in ticket_type_list %}
+                        <option value="{{ type.id }}" {% if type.id|safe in tkt_type|safe %}selected{% endif %}>
+                            {{ type }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <!-- search + reset -->
+                <div class="col s12 l4 input-field">
+                    <button type="submit" class="btn">Search</button>
+                    <a class="btn" href="{% url 'all_tickets' %}">Reset</a>
                 </div>
             </div>
         </div>
-    </a>
-    {% endfor %}
+    </form>
+
+    <!-- add new tickets -->
+    <div class="card-border">
+        <div class="card">
+
+            {% if user.is_authenticated %}
+            <div class="row">
+                <div class="col s12 m6 center-align">
+                    <h3 class="purple-text text-darken-3">
+                        Problem with the App? Please open a Bug Report! Bug Reports are Free!
+                    </h3>
+                </div>
+                <div class="col s12 m6 center-align">
+                    <a href="{% url 'new_bug' %}" class="btn btn-large">Bug Report</a>
+                </div>
+            </div>
+
+            <br>
+            <div class="divider pink lighten-2"></div>
+            <br>
+
+            <div class="row">
+                <div class="col s12 m6 center-align">
+                    <h3 class="purple-text text-darken-3">
+                        Did we miss something? Feature Requests can be submitted for €100.
+                    </h3>
+                </div>
+                <div class="col s12 m6 center-align">
+                    <a href="{% url 'new_feature' %}" class="btn btn-large">Feature Request</a>
+                </div>
+            </div>
+            {% else %}
+            <div class="row">
+                <div class="col s12 center-align">
+                    <h2 class="purple-text text-darken-3">
+                        Please <a href="{% url 'login' %}" class="pink-text text-lighten-2">log in</a> or
+                        <a href="{% url 'register' %}" class="pink-text text-lighten-2">register</a>
+                        to create a new ticket!
+                    </h2>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+    <div class="row">
+        {% for ticket in tickets %}
+        <a href="{% url 'ticket_detail' ticket.id %}">
+            <div id="tickets" class="col s12 m6">
+                <div class="card hoverable">
+                    <div class="card-content">
+                        <p id="tkt-title" class="center-align purple-text text-darken-3 truncate">
+                            {% if ticket.ticket_type_id == 2 %}
+                            <i class="fas fa-code-branch"></i>
+                            {% else %}
+                            <i class="fas fa-bug prefix"></i>
+                            {% endif %}
+                            {{ ticket.title }}
+                        </p>
+                        <div class="divider "></div>
+                        <br>
+                        <div class="row">
+                            <p class="col s12 center-align large-text"><i
+                                    class="fas fa-wrench purple-text text-darken-3"></i>
+                                {{ ticket.status }}</p>
+                        </div>
+                        <br>
+                        <p class="truncate large-text"><i class="fas fa-comment-dots purple-text text-darken-3"></i>
+                            {{ ticket.description }}</p>
+                    </div>
+                    <div id="tkt-footer" class="card-action">
+                        <div class="row">
+                            <div class="col s6">
+                                <p class="center-align white-text"><i class="fas fa-eye"></i> {{ ticket.views }}</p>
+                            </div>
+                            <div class="col s6">
+                                <p class="center-align white-text"><i class="fas fa-thumbs-up"></i> {{ ticket.upvotes }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
 </div>
 
+<!-- pagination -->
 {% include "partials/pagination.html" %}
+
 {% endblock %}

@@ -1,45 +1,91 @@
 {% extends "base.html" %}
-
+{% load staticfiles %}
 {% load materializecss %}
 
 {% block page_title %}{{ user.first_name }}'s Profile{% endblock %}
 
+{% block styles %}
+<style>
+    body {
+        background: url("{% static 'img/purple-bg.jpg' %}") no-repeat center center fixed;
+        background-size: cover;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="row">
-    <div class="col s12">
+<div class="container">
+    <div class="card-border">
         <div class="card">
             <div class="card-content">
+
                 <div class="row">
-                    <div class="col s12 m4">
-                        <img src="{{ user.profile.image.url }}" alt="Profile Picture"
-                            class="rounded-circle account-img">
+
+                    <div class="col s12 m4 center-align">
+                        <img src="{{ user.profile.image.url }}" alt="Profile Picture" class="circle responsive-img"
+                            height="150">
                     </div>
+
                     <div class="col s12 m8">
                         <div class="row">
                             <div class="col s12">
-                                <h4>{{ user.username }}'s Profile</h4>
-                            </div>
-                            <div class="col s12">
-                                <small>Email:</small>
-                                {{ user.email }}</p>
+                                <h1 id="h1-large" class="center-align font-baloo white-text card-border text-shadow">
+                                    Profile
+                                </h1>
                             </div>
                         </div>
+
                         <div class="row">
-                            <div class="col s6">
-                                <small>Name:</small>
-                                {{ user.get_full_name }}
+                            <div class="col s12 m10 offset-m1 l6">
+                                <h3>
+                                    <small class="purple-text text-darken-3 bold">Name:</small>
+                                    <br>
+                                    {{ user.get_full_name }}
+                                </h3>
                             </div>
-                            <div class="col s6">
-                                <small>Username:</small>
-                                {{ user.username }}
+                            <div class="col s12 m10 offset-m1 l6">
+                                <h3>
+                                    <small class="purple-text text-darken-3 bold">Username:</small>
+                                    <br>
+                                    {{ user.username }}
+                                </h3>
                             </div>
                         </div>
+
+                        <div class="row">
+                            <div class="col s12 m10 offset-m1 l6">
+                                <h3>
+                                    <small class="purple-text text-darken-3 bold">Email:</small>
+                                    <br>
+                                    {{ user.email }}
+                                </h3>
+                            </div>
+                            <div class="col s12 m10 offset-m1 l6">
+                                <h3>
+                                    <small class="purple-text text-darken-3 bold">Member Since:</small>
+                                    <br>
+                                    {{ user.date_joined|date:"j E, Y" }}
+                                </h3>
+                            </div>
+                        </div>
+
+                        <br>
+                        <div class="divider pink lighten-2"></div>
+                        <br>
+
+                        <div class="row">
+                            <div class="col s12">
+                                <a href="#modal-edit-profile" class="btn modal-trigger indigo accent-3">
+                                    Edit Profile
+                                </a>
+                                <a href="{% url 'password_reset' %}" class="btn indigo accent-3">
+                                    Change Password
+                                </a>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
-            </div>
-
-            <div class="card-action center-align">
-                <a href="#modal-edit-profile" class="btn modal-trigger deep-purple darken-1">Edit Profile</a>
             </div>
         </div>
     </div>
@@ -47,8 +93,10 @@
 
 <div id="modal-edit-profile" class="modal">
     <div class="modal-content center-align">
-        <h3>Edit Profile</h3>
-        <form method="post" enctype="multipart/form-data">
+        <h1 id="h1-large" class="center-align font-baloo white-text card-border text-shadow">
+            Edit Profile
+        </h1>
+        <form method="post" enctype="multipart/form-data" class="bold">
             {% csrf_token %}
             <div class="row">
                 <div class="col s12 m6">
@@ -57,6 +105,8 @@
                 <div class="col s12 m6">
                     {{ user_form.last_name|materializecss }}
                 </div>
+            </div>
+            <div class="row">
                 <div class="col s12 m6">
                     {{ user_form.email|materializecss }}
                 </div>
@@ -66,7 +116,7 @@
             </div>
             <div class="row">
                 <div class="col s12 m6 offset-m3">
-                    <button type="submit" class="btn deep-purple darken-1">Update</button>
+                    <button type="submit" class="btn btn-large indigo accent-3">Update</button>
                 </div>
             </div>
         </form>
