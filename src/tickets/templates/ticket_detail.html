@@ -45,6 +45,19 @@
                             {% endif %}
                     {% endif %}
                 {% endif %}
+                {% if user.is_superuser %}
+                <form action="{% url 'admin_status_update' ticket.id %}" method="get">
+                <div class="col s12 m3 l3 input-field">
+                        <select name="tkt_status" id="tkt_status" class="browser-default border">
+                            {% for status in ticket_status_list %}
+                            <option value="{{ status.id }}" {% if status.id|safe in tkt_status|safe %}selected{% endif %}>
+                                {{ status }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn deep-purple darken-1">Update</button>
+                </form>
+                {% endif %}
                 <br><br>
                 <p>Upvotes: {{ ticket.upvotes }}</p>
             </div>

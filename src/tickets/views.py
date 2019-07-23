@@ -141,6 +141,8 @@ def ticket_detail(request, pk):
     comments = Comment.objects.filter(ticket_id=ticket.pk)
     upvotes = Upvote.objects.filter(ticket_id=ticket.pk).values("user_id")
     voters = [vote["user_id"] for vote in upvotes]
+    ticket_status_list = TicketStatus.objects.all()
+    tkt_status = ticket.status.id
     previous = request.META.get('HTTP_REFERER')
     restore_args = None
     if "edit" in previous or "new" in previous:
@@ -155,12 +157,27 @@ def ticket_detail(request, pk):
         "voters": voters,
         "publishable": settings.STRIPE_PUBLISHABLE,
         "previous": previous,
-        "args": restore_args
+        "args": restore_args,
+        "ticket_status_list": ticket_status_list,
+        "tkt_status": tkt_status
     }
     return render(
         request,
         "ticket_detail.html",
         context
+    )
+
+
+@login_required
+def admin_status_update(request, pk):
+    ticket = get_object_or_404(Ticket, pk=pk)
+    tkt_status = request.GET.get("tkt_status")
+    Ticket.objects.filter(id=ticket.pk).update(status=tkt_status, last_updated=timezone.now())
+    ticket.views -= 1
+    ticket.save()
+    return redirect(
+        ticket_detail,
+        ticket.pk
     )
 
 
