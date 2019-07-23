@@ -5,8 +5,82 @@
 {% block styles %}
 <style>
     body {
-        background: url("{% static 'img/purple-gems.jpg' %}") no-repeat center center fixed;
+        background: url("{% static 'img/purple-bg.jpg' %}") no-repeat center center fixed;
         background-size: cover;
     }
 </style>
+{% endblock %}
+
+{% block content %}
+<div id="bg-uni-stairs">
+    <div class="landing-title center-align white-text bold text-shadow-soft">
+        <h1>Welcome to the Unicorn Attractor!</h1>
+        <p>The sensational dating app for those that love to express their inner Unicorn!</p>
+    </div>
+</div>
+
+<section class="section section-purple center-align text-shadow-soft">
+    <h1>Don’t be shy, gallop on over!</h1>
+    <div class="container">
+        <p>
+            With 20 billion matches to date, Unicorn Attractor is one of the world’s most popular dating sites for
+            meeting new people that share your Unicorn love. Think of us as your most dependable wingman - wherever you
+            go, we’ll be there, offering all the possibilities of riding off into the sunset.
+        </p>
+        <p>
+            If you’re here to meet new people, expand your social network, meet local Unicorns when you’re traveling, or
+            just live in the glittering, sparkling now, you’ve come to the right place. We’re one of the world’s best
+            dating apps for a reason: we spark more than 26 million matches per day. How many dating apps do that?
+        </p>
+    </div>
+</section>
+
+<div id="bg-uni-party"></div>
+
+<section class="section section-pink center-align text-shadow-soft">
+    <h1>Swipe. Match. Chat. Date.</h1>
+    <div class="container">
+        <p>
+            Unicorn Attractor is easy and fun—Swipe Right to send your Rainbow Powers to someone, or Swipe Left to pass
+            to pastures new. If someone likes you back, it’s a match!
+        </p>
+        <p>
+            We invented the double opt-in so that two people will only match when there’s a mutual interest. No stress.
+            No rejection. Just swipe, match, and chat online with your matches, then step away from your phone and meet
+            up in the real world to spark something truly magical.
+        </p>
+    </div>
+</section>
+
+<div id="bg-uni-party"></div>
+
+<section class="section section-purple center-align text-shadow-soft">
+    <h1>Unicorn Attractor</h1>
+    <div class="container">
+        <p>
+            The largest community of single magical beasts in the world on the best dating app!
+        </p>
+    </div>
+</section>
+
+<div id="bg-uni-cafe"></div>
+
+<section class="section section-pink center-align text-shadow-soft">
+    <h1>Having difficulties? Think we could do things better?</h1>
+    <div class="container">
+        <p>
+            Head on over to our support section, where you'll be able to request new features for us to implement or
+            raise a bug report should things have gone wrong.
+        </p>
+        <a href="{% url 'all_tickets' %}" class="btn btn-large">Support Tickets</a>
+        <p>
+            There's a nominal fee when requesting a new feature to cover our development costs, but we promise that
+            we'll spend at least half of our time working on making those crazy dreams of yours come true! Bug
+            fixes, of course, will always be free!
+        </p>
+    </div>
+</section>
+
+<div id="bg-uni-cafe"></div>
+
 {% endblock %}

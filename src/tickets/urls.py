@@ -8,7 +8,8 @@ from .views import (
     delete_ticket,
     create_comment,
     upvote,
-    downvote
+    downvote,
+    admin_status_update
 )
 
 urlpatterns = [
@@ -21,4 +22,5 @@ urlpatterns = [
     url(r'^edit/(?P<pk>\d+)', edit_ticket, name="edit_ticket"),
     url(r'^add-comment/(?P<pk>\d+)', create_comment, name="create_comment"),
     url(r'^delete/(?P<pk>\d+)', delete_ticket, name="delete_ticket"),
+    url(r'^status-update/(?P<pk>\d+)', admin_status_update, name="admin_status_update"),
 ]
