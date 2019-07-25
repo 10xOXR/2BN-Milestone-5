@@ -1,29 +1,45 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 
 {% load materializecss %}
 
 {% block page_title %}Raise a Ticket{% endblock %}
 
+{% block styles %}
+<style>
+    body {
+        background: url("{% static 'img/purple-bg.jpg' %}") no-repeat center center fixed;
+        background-size: cover;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="row">
-    <div class="col s12">
-        <div class="card">
-            <div class="card-content">
-                <h2 class="center">Bug Report</h2>
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="row">
-                        <div class="col s12">
-                            {{ bug_form|materializecss }}
-                        </div>
+<div class="container">
+    <div class="row">
+        <div class="col s12">
+            <div class="card-border">
+                <div class="card">
+                    <div class="card-content">
+                        <h1 class="center-align purple-text text-darken-3 upper">
+                            Bug Report
+                        </h1>
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col s12">
+                                    {{ bug_form|materializecss }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col s12 center">
+                                    <button type="submit" class="btn">Submit Bug</button>
+                                    <a href="{% url 'all_tickets' %}" class="btn red">Cancel</a>
+                                </div>
+                            </div>
+                        </form>
                     </div>
-                    <div class="row">
-                        <div class="col s12 center">
-                            <button type="submit" class="btn deep-purple darken-1">Submit Bug</button>
-                            <a href="{% url 'all_tickets' %}" class="btn red darken-4">Cancel</a>                            
-                        </div>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>

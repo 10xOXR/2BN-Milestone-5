@@ -5,72 +5,250 @@
 
 {% block page_title %}Ticket Detail{% endblock %}
 
+{% block styles %}
+<style>
+    body {
+        background: url("{% static 'img/purple-bg.jpg' %}") no-repeat center center fixed;
+        background-size: cover;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="row">
-    <div class="col s12">
+<div class="container">
+    <div class="row">
+        <div class="col s12 m8 offset-m2 l6 offset-l3">
+            <h1 id="h1-large" class="center-align font-baloo white-text card-border text-shadow">
+                {{ ticket.ticket_type }} Details
+            </h1>
+        </div>
+    </div>
+
+    <div class="card-border">
         <div class="card">
             <div class="card-content">
-                <h2 class="center">Ticket Detail</h2>
-                <p><strong>Title:</strong> {{ ticket.title }}</p>
-                <p><strong>Type:</strong> {{ ticket.ticket_type }}</p>
-                <p><strong>Raised By:</strong> {{ ticket.raised_by }}</p>
-                <p><strong>Status:</strong> {{ ticket.status }}</p>
-                <p><strong>Description:</strong> {{ ticket.description|linebreaksbr }}</p>
-                <p><strong>Created:</strong> {{ ticket.raised_on }}</p>
-                <p><strong>Last Updated:</strong> {{ ticket.last_updated }}</p>
-                <p><strong>Views:</strong> {{ ticket.views }}</p>
-                {% if "new" in previous  %}
-                    <a href="{% url 'all_tickets' %}" class="btn waves-effect waves-light deep-purple darken-1">Go back</a>
-                {% elif "edit" in previous %}
-                    <a href="{% url 'all_tickets' %}?{{ args }}" class="btn waves-effect waves-light deep-purple darken-1">Go back</a>
-                {% else %}
-                    <a href="javascript:history.back();" class="btn waves-effect waves-light deep-purple darken-1">Go back</a>
-                {% endif %}
-                {% if user.id == ticket.raised_by.id or user.is_superuser %}
-                    <a href="{% url 'edit_ticket' ticket.id %}"
-                        class="btn waves-effect waves-light deep-purple darken-1">Edit</a>
-                    <a href="#modal-delete" class="btn modal-trigger waves-effect waves-light red darken-4">Delete</a>
-                    {% endif %}
-                    {% if user.is_authenticated %}
-                        <a href="{% url 'create_comment' ticket.id %}"
-                            class="btn waves-effect waves-light deep-purple darken-1">Add Comment</a>
-                        {% if user.id in voters %}
-                            <a href="{% url 'downvote' ticket.id %}" class="btn waves-effect waves-light red darken-4">Remove
-                                Vote</a>
-                        {% else %}
-                            {% if ticket.ticket_type == "Feature Request" %}
-                                <a href="#modal-feature-upvote" class="btn modal-trigger waves-effect waves-light success">Upvote</a>
-                            {% else %}
-                                <a href="{% url 'upvote' ticket.id %}" class="btn waves-effect waves-light success">Upvote</a>
-                            {% endif %}
-                    {% endif %}
-                {% endif %}
-                {% if user.is_superuser %}
-                <form action="{% url 'admin_status_update' ticket.id %}" method="get">
-                <div class="col s12 m3 l3 input-field">
-                        <select name="tkt_status" id="tkt_status" class="browser-default border">
-                            {% for status in ticket_status_list %}
-                            <option value="{{ status.id }}" {% if status.id|safe in tkt_status|safe %}selected{% endif %}>
-                                {{ status }}</option>
-                            {% endfor %}
-                        </select>
+                <div class="row">
+
+                    <div class="col s12 m4 center-align">
+                        <img src="{{ ticket.raised_by.profile.image.url }}" alt="{{ ticket.raised_by }}" class="circle responsive-img"
+                            height="50">
                     </div>
-                    <button type="submit" class="btn deep-purple darken-1">Update</button>
-                </form>
-                {% endif %}
-                <br><br>
-                <p>Upvotes: {{ ticket.upvotes }}</p>
+
+                    <div class="col s12 m8">
+                        <div class="row">
+                            <div class="col s12">
+                                <h2 class="center-align purple-text text-darken-3 upper">
+                                    {{ ticket.title }}
+                                </h2>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col s12 m10 offset-m1 l6">
+                                <h3>
+                                    <small class="purple-text text-darken-3 bold">Raised by:</small>
+                                    <br>
+                                    {{ ticket.raised_by }}
+                                </h3>
+                            </div>
+                            <div class="col s12 m10 offset-m1 l6">
+                                <h3>
+                                    <small class="purple-text text-darken-3 bold">Status:</small>
+                                    <br>
+                                    {{ ticket.status }}
+                                </h3>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col s12 m10 offset-m1 l6">
+                                <h3>
+                                    <small class="purple-text text-darken-3 bold">Created:</small>
+                                    <br>
+                                    {{ ticket.raised_on|date:'d/m/Y - H:i' }}
+                                </h3>
+                            </div>
+                            <div class="col s12 m10 offset-m1 l6">
+                                <h3>
+                                    <small class="purple-text text-darken-3 bold">Updated:</small>
+                                    <br>
+                                    {{ ticket.last_updated|date:'d/m/Y - H:i' }}
+                                </h3>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col s6">
+                                <h3>
+                                    <small class="purple-text text-darken-3 bold">Views:</small>
+                                    <br>
+                                    {{ ticket.views }}
+                                </h3>
+                            </div>
+                            <div class="col s6">
+                                <h3>
+                                    <small class="purple-text text-darken-3 bold">Upvotes:</small>
+                                    <br>
+                                    {{ ticket.upvotes }}
+                                </h3>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col s12">
+                                <h3>
+                                    <small class="purple-text text-darken-3 bold">Details:</small>
+                                    <br>
+                                    {{ ticket.description|linebreaksbr }}
+                                </h3>
+                            </div>
+                        </div>
+
+                        {% if user.is_authenticated %}
+                        <br>
+                        <div class="divider pink lighten-2"></div>
+                        <br>
+
+                        <div class="row">
+                            <div class="col s12">
+
+                                {% if user.is_authenticated %}
+                                    {% if user.id in voters %}
+                                        <a href="{% url 'downvote' ticket.id %}" class="btn red darken-4">
+                                            Remove Vote
+                                        </a>
+                                    {% else %}
+                                        {% if ticket.ticket_type_id == 2 %}
+                                            <a href="#modal-feature-upvote" class="btn modal-trigger">
+                                                Upvote
+                                            </a>
+                                        {% else %}
+                                            <a href="{% url 'upvote' ticket.id %}" class="btn">
+                                                Upvote
+                                            </a>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
+
+                                {% if user.id == ticket.raised_by.id or user.is_superuser %}
+                                <a href="{% url 'edit_ticket' ticket.id %}" class="btn">
+                                    Edit
+                                </a>
+                                <a href="#modal-delete" class="btn modal-trigger red darken-4">
+                                    Delete
+                                </a>
+                                {% endif %}
+
+                            </div>
+                        </div>
+
+                            {% if user.is_superuser %}
+                            <br>
+                            <div class="divider pink lighten-2"></div>
+                            <br>
+
+                            <div class="row">
+                                <form action="{% url 'admin_status_update' ticket.id %}" method="get">
+                                    <div class="col s12 m6">
+                                        <select name="tkt_status" id="tkt_status" class="browser-default border">
+                                            {% for status in ticket_status_list %}
+                                            <option value="{{ status.id }}"
+                                                {% if status.id|safe in tkt_status|safe %}selected{% endif %}>
+                                                {{ status }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col s12 m6">
+                                        <button type="submit" class="btn deep-purple darken-1">Update</button>
+                                    </div>
+                                </form>
+                            </div>
+                            {% endif %}
+
+                        {% endif %}
+
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    <div class="card-border">
+        <div class="card">
+            <h2 class="center-align purple-text text-darken-3 upper">
+                Comments
+            </h2>
+            <div class="divider pink lighten-2"></div>
+            <br>
+            <div class="card-content">
+                <ul class="collection">
+                    {% for comment in comments %}
+                    <li class="collection-item avatar white">
+                        <img src="{{ comment.author.profile.image.url }}" alt="{{ comment.author }}" class="circle">
+                        <span class="title purple-text text-darken-3 bold">
+                            {{ comment.author }}
+                        </span>
+                        <small class="purple-text">
+                            {{ comment.created|date:'d/m/Y - H:i' }}
+                        </small>
+                        <p>
+                            {{ comment.comment_text|linebreaksbr }}
+                        </p>
+                    </li>
+                    {% empty %}
+                    <li class="collection-item white">
+                        <span class="title purple-text text-darken-3 bold">
+                            There are currently no comments on this ticket.
+                        </span>
+                    </li>
+                    {% endfor %}
+                </ul>
+
+                {% if user.is_authenticated %}
+                    {% if ticket.status_id != 3 %}
+                        <form action="{% url 'create_comment' ticket.id %}" method="post" class="center-align">
+                            {% csrf_token %}
+                            {{ new_comment|materializecss }}
+                            <button type="submit" class="btn">
+                                Add Comment
+                            </button>
+                        </form>
+                    {% else %}
+                        <div class="center-align purple-text text-darken-3 bold">
+                            Comments are now closed for this ticket.
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="center-align purple-text text-darken-3 bold">
+                        Please <a href="{% url 'login' %}" class="pink-text text-lighten-2">log in</a> or
+                        <a href="{% url 'register' %}" class="pink-text text-lighten-2">register</a>
+                        to leave a comment!
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col s12 center-align">
+            {% if "new" in previous  %}
+                <a href="{% url 'all_tickets' %}" class="btn btn-large">Go back</a>
+            {% elif "edit" in previous %}
+                <a href="{% url 'all_tickets' %}?{{ args }}" class="btn btn-large">Go back</a>
+            {% else %}
+                <a href="javascript:history.back();" class="btn btn-large">Go back</a>
+            {% endif %}
+        </div>
+    </div>
+
 </div>
 
 <div id="modal-delete" class="modal">
     <div class="modal-content center-align">
-        <h3>Delete Ticket</h3>
-        <p class="center">Are you Sure? This cannot be undone!</p>
-        <a href="{% url 'delete_ticket' ticket.id %}" class="btn red darken-4">Confirm</a>
-        <a href="#" class="btn modal-close success">Cancel</a>
+        <h1 class="purple-text text-darken-3 upper">Delete Ticket</h1>
+        <h2 class="center">Are you Sure? This cannot be undone!</h2>
+        <a href="{% url 'delete_ticket' ticket.id %}" class="btn red">Confirm</a>
+        <a href="#" class="btn modal-close">Cancel</a>
     </div>
 </div>
 
@@ -93,10 +271,6 @@
         </form>
     </div>
 </div>
-
-{% for comment in comments %}
-<p>{{ comment.comment_text|linebreaksbr }}</p>
-{% endfor %}
 {% endblock %}
 
 {% block page_js %}

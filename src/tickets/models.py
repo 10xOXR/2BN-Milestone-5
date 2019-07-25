@@ -24,7 +24,7 @@ class TicketStatus(models.Model):
 
 class TicketType(models.Model):
     TICKET_STATUS_OPTIONS = (
-        ("Bug Request", "Bug Request"),
+        ("Bug Report", "Bug Report"),
         ("Feature Request", "Feature Request")
     )
     ticket_type = models.CharField(
