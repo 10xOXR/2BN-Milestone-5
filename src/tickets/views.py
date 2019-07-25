@@ -113,25 +113,17 @@ def new_feature(request):
 
 @login_required
 def create_comment(request, pk):
-    parent_ticket = get_object_or_404(Ticket, pk=pk)
     if request.method == "POST":
+        parent_ticket = get_object_or_404(Ticket, pk=pk)
         new_comment = CommentForm(request.POST)
         if new_comment.is_valid():
             new_comment.instance.author = request.user
             new_comment.instance.ticket = parent_ticket
             new_comment.save()
-            return redirect(ticket_detail, parent_ticket.pk)
-    else:
-        new_comment = CommentForm()
-
-    context = {
-        "new_comment": new_comment
-    }
-    return render(
-        request,
-        "create_comment.html",
-        context
-    )
+        return redirect(
+            ticket_detail,
+            parent_ticket.pk
+        )
 
 
 def ticket_detail(request, pk):
@@ -143,6 +135,7 @@ def ticket_detail(request, pk):
     voters = [vote["user_id"] for vote in upvotes]
     ticket_status_list = TicketStatus.objects.all()
     tkt_status = ticket.status.id
+    new_comment = CommentForm()
     previous = request.META.get('HTTP_REFERER')
     restore_args = None
     if "edit" in previous or "new" in previous:
@@ -159,7 +152,8 @@ def ticket_detail(request, pk):
         "previous": previous,
         "args": restore_args,
         "ticket_status_list": ticket_status_list,
-        "tkt_status": tkt_status
+        "tkt_status": tkt_status,
+        "new_comment": new_comment
     }
     return render(
         request,
@@ -172,9 +166,9 @@ def ticket_detail(request, pk):
 def admin_status_update(request, pk):
     ticket = get_object_or_404(Ticket, pk=pk)
     tkt_status = request.GET.get("tkt_status")
-    Ticket.objects.filter(id=ticket.pk).update(status=tkt_status, last_updated=timezone.now())
     ticket.views -= 1
     ticket.save()
+    Ticket.objects.filter(id=ticket.pk).update(status=int(tkt_status), last_updated=timezone.now())
     return redirect(
         ticket_detail,
         ticket.pk
