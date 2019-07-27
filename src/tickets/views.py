@@ -138,11 +138,12 @@ def ticket_detail(request, pk):
     new_comment = CommentForm()
     previous = request.META.get('HTTP_REFERER')
     restore_args = None
-    if "edit" in previous or "new" in previous:
-        restore_args = request.session.get('prev_args')
-    else:
-        parsed = urlparse(previous).query
-        request.session['prev_args'] = parsed
+    if previous:
+        if "edit" in previous or "new" in previous:
+            restore_args = request.session.get('prev_args')
+        else:
+            parsed = urlparse(previous).query
+            request.session['prev_args'] = parsed
 
     context = {
         "ticket": ticket,

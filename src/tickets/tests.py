@@ -1,7 +1,7 @@
-from django.test import TestCase
+from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from django.shortcuts import reverse, get_object_or_404
-from .models import Ticket
+from .models import Ticket, TicketStatus, TicketType
 from .forms import TicketForm, CommentForm
 from .views import (
     all_tickets,
@@ -40,16 +40,24 @@ class TestCommentForm(TestCase):
 
 class TestTicketsViews(TestCase):
     def setUp(self):
+        TicketStatus.objects.create(ticket_status="To-Do (Not Started)")
+        TicketStatus.objects.create(ticket_status="In Progress")
+        TicketType.objects.create(ticket_type="Bug Report")
+        TicketType.objects.create(ticket_type="Feature Request")
+        previous = Client(
+            HTTP_REFERER='http://127.0.0.1:8000/tickets/',
+        )
         Ticket.objects.create(
             title="Test Bug",
             description="Test description1",
-            status="To-Do (Not Started)",
-            ticket_type="Bug Request").save()
+            # status_id=1,
+            status=TicketStatus(id=1),
+            ticket_type=TicketType(id=1)).save()
         Ticket.objects.create(
             title="Test Feature",
             description="Test description2",
-            status="To-Do (Not Started)",
-            ticket_type="Feature Request").save()
+            status=TicketStatus(id=1),
+            ticket_type=TicketType(id=2)).save()
         self.client.post(
             "/users/register/",
             {"email": "Test@Email.com",
@@ -59,24 +67,24 @@ class TestTicketsViews(TestCase):
                 "password1": "Testtest1",
                 "password2": "Testtest1"})
 
-    def test_tickets_view_all(self):
+    def test_all_tickets(self):
         page = self.client.get("/tickets/")
         self.assertEqual(page.status_code, 200)
         self.assertTemplateUsed(page, "tickets.html")
 
-    def test_tickets_view_one(self):
+    def test_ticket_detail(self):
         ticket = Ticket.objects.filter(title="Test Bug")[0]
         response = self.client.get(
             "/tickets/details/{0}".format(ticket.pk), follow=True)
-        self.assertIn(b"Last Updated", response.content)
+        self.assertIn(b"Updated:", response.content)
 
     def test_tickets_new_bug(self):
         self.client.post(
             "/tickets/new/bug",
             {"title": "Another Bug",
                 "description": "Test description3",
-                "status": "To-Do (Not Started)",
-                "ticket_type": "Bug Report"})
+                "status_id": "1",
+                "ticket_type_id": "1"})
         ticket = Ticket.objects.filter(title="Another Bug")[0]
         self.assertEqual("Another Bug", ticket.title)
 
@@ -115,7 +123,7 @@ class TestTicketsViews(TestCase):
         response = self.client.get(
             "/tickets/edit/{0}".format(ticket.pk), follow=True)
         self.assertIn(
-            b'<h2 class="center">Edit a Ticket</h2>',
+            b'<h1 class="center-align purple-text text-darken-3 upper"',
             response.content)
 
     def test_tickets_edit_saved(self):
