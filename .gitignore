@@ -14,3 +14,7 @@ media/
 
 # Envirronmental Variables
 env.py
+
+# Coverage test files
+htmlcov/
+.coverage
