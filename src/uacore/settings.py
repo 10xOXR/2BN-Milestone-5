@@ -1,10 +1,12 @@
 import os
 import dj_database_url
 
+
 # If developing locally and using 'env.py' then import env
 # and set DEBUG to True
-if os.path.exists("env.py"):
-    import env
+if os.path.exists('../.env'):
+    from dotenv import load_dotenv
+    load_dotenv()
     DEBUG = True
 else:
     DEBUG = False
