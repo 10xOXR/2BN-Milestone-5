@@ -12,8 +12,8 @@ media/
 # Local Database
 *.sqlite3
 
-# Envirronmental Variables
-env.py
+# Environmental Variables
+.env
 
 # Coverage test files
 htmlcov/

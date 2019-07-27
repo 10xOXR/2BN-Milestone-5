@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/10xOXR/2BN-Milestone-5.svg?branch=master)](https://travis-ci.org/10xOXR/2BN-Milestone-5)
+
 #   The Unicorn Attractor
 
 An Issue Tracker that allows users to view/create bug tickets (for free) and open feature requests (for a fee). 
