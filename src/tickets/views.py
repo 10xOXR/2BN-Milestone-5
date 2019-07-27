@@ -76,7 +76,7 @@ def new_feature(request):
             try:
                 token = request.POST["stripeToken"]
                 customer = stripe.Charge.create(
-                    amount = int(100 * 100),
+                    amount = 1000,
                     currency = "EUR",
                     description = (
                         "Feature Request: "+\
@@ -84,17 +84,17 @@ def new_feature(request):
                             " (" + request.user.email + ")"),
                     source=token,
                 )
-                if customer.paid:
+            except stripe.error.CardError:
+                messages.error(request, "Your card was declined!")
+            if customer.paid:
                     messages.success(request, "You have successfully paid!")
                     feature_form.instance.raised_by = request.user
                     feature_form.instance.ticket_type_id = "2"
                     feature_form.instance.status_id = "1"
                     new_feature = feature_form.save()
                     return redirect(ticket_detail, new_feature.pk)
-                else:
-                    messages.error(request, "Unable to take payment!")
-            except stripe.error.CardError:
-                messages.error(request, "Your card was declined!")
+            else:
+                messages.error(request, "Unable to take payment!")
         else:
             messages.error(request, "Unable to take a payment with that card!")
     else:
@@ -170,6 +170,7 @@ def admin_status_update(request, pk):
     ticket.views -= 1
     ticket.save()
     Ticket.objects.filter(id=ticket.pk).update(status=int(tkt_status), last_updated=timezone.now())
+    messages.success(request, "Ticket status updated!")
     return redirect(
         ticket_detail,
         ticket.pk
@@ -186,7 +187,7 @@ def upvote(request, pk):
         try:
             token = request.POST['stripeToken']
             customer = stripe.Charge.create(
-                amount = int(5 * 100),
+                amount = 500,
                 currency = "EUR",
                 description = (
                     "Feature Upvote: "+\
@@ -194,17 +195,17 @@ def upvote(request, pk):
                         " (" + request.user.email + ")"),
                 source=token,
             )
-            if customer.paid:
+        except stripe.error.CardError:
+            messages.error(request, "Your card was declined!")
+        if customer.paid:
                 messages.success(request, "You have successfully paid!")
                 Upvote.objects.create(
                     ticket_id=ticket.pk,
                     user_id=request.user.id
                 )
                 return redirect(ticket_detail, ticket.pk)
-            else:
-                messages.error(request, "Unable to take payment!")
-        except stripe.error.CardError:
-            messages.error(request, "Your card was declined!")
+        else:
+            messages.error(request, "Unable to take payment!")
     else:
         Upvote.objects.create(
             ticket_id=ticket.pk,
@@ -240,6 +241,7 @@ def edit_ticket(request, pk):
         if edit_ticket.is_valid():
             edit_ticket.instance.last_updated = timezone.now()
             edit_ticket.save()
+            messages.success(request, "Ticket updated successfully!")
             return redirect(ticket_detail, ticket.pk)
     else:
         edit_ticket = TicketForm(instance=ticket)

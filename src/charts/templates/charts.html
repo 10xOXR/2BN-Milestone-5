@@ -19,7 +19,7 @@
         <div class="row">
             <div class="col s12 m8 offset-m2 l6 offset-l3">
                 <h1 id="h1-large" class="center-align font-baloo white-text card-border text-shadow">
-                    Statistics
+                    Bug Stats
                 </h1>
             </div>
         </div>
@@ -29,7 +29,7 @@
         <div class="col s12 l6">
             <div class="card-border">
                 <div class="card">
-                    <canvas id="bugsVsFeatures" height="200"></canvas>
+                    <canvas id="bug_status" height="200"></canvas>
                 </div>
             </div>
         </div>
@@ -38,22 +38,38 @@
         <div class="col s12 l6">
             <div class="card-border">
                 <div class="card">
-                    <canvas id="status" height="200"></canvas>
+                    <canvas id="bug_updated" height="200"></canvas>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="row">
-        <!-- update frequency -->
+            <div class="col s12 m8 offset-m2 l6 offset-l3">
+                <h1 id="h1-large" class="center-align font-baloo white-text card-border text-shadow">
+                    Feature Stats
+                </h1>
+            </div>
+        </div>
+
+    <div class="row">
+        <!-- bugs vs features -->
         <div class="col s12 l6">
             <div class="card-border">
                 <div class="card">
-                    <canvas id="updatedTickets" height="200"></canvas>
+                    <canvas id="feature_status" height="200"></canvas>
                 </div>
             </div>
         </div>
 
+        <!-- ticket status -->
+        <div class="col s12 l6">
+            <div class="card-border">
+                <div class="card">
+                    <canvas id="feature_updated" height="200"></canvas>
+                </div>
+            </div>
+        </div>
     </div>
 
 </div>
@@ -62,48 +78,17 @@
 
 {% block page_js %}
 <script>
-    var bugs_count = {{ bugs_count|safe }};
-    var features_count = {{ features_count|safe }};
+    var bug_todo_count = {{ bug_todo_count|safe }};
+    var bug_in_progress_count = {{ bug_in_progress_count|safe }};
+    var bug_completed_count = {{ bug_completed_count|safe }};
 
-    Chart.defaults.global.defaultFontColor = "#4a148c";
-    Chart.defaults.global.defaultFontSize = 18;
-
-
-    new Chart(document.getElementById('bugsVsFeatures'), {
-        type: 'pie',
-        data: {
-            labels: ['Bug Reports', 'Feature Requests'],
-            datasets: [{
-                label: 'Bugs vs Features',
-                data: [bugs_count, features_count],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.25)',
-                    'rgba(54, 162, 235, 0.25)'
-                ],
-                hoverBackgroundColor: [
-                    'rgba(255, 99, 132, 0.5)',
-                    'rgba(54, 162, 235, 0.5)'
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)'
-                ],
-                borderWidth: 1
-            }]
-        }
-    });
-
-    var todo_count = {{ todo_count|safe }};
-    var in_progress_count = {{ in_progress_count|safe }};
-    var completed_count = {{ completed_count|safe }};
-
-    new Chart(document.getElementById('status'), {
+    new Chart(document.getElementById('bug_status'), {
         type: 'pie',
         data: {
             labels: ['To-Do', 'In Progress', 'Completed'],
             datasets: [{
                 label: 'Ticket Status',
-                data: [todo_count, in_progress_count, completed_count],
+                data: [bug_todo_count, bug_in_progress_count, bug_completed_count],
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.25)',
                     'rgba(54, 162, 235, 0.25)',
@@ -121,20 +106,31 @@
                 ],
                 borderWidth: 1
             }]
-        }
+        },
+        options: {
+                title: {
+                    display: true,
+                    text: 'Bug Status',
+                    fontSize: 20,
+                    fontStyle: "bold"
+                },
+                legend: {
+                    display: true,
+                    position: 'right'
+                },
+            },
     });
 
-    var daily_updated = {{ daily_updated|safe }};
-    var weekly_updated = {{ weekly_updated|safe }};
-    var updated_tickets = {{ updated_tickets|safe }};
+    var bug_daily_updated = {{ bug_daily_updated|safe }};
+    var bug_weekly_updated = {{ bug_weekly_updated|safe }};
+    var bug_monthly_updated = {{ bug_monthly_updated|safe }};
 
-    new Chart(document.getElementById('updatedTickets'), {
+    new Chart(document.getElementById('bug_updated'), {
         type: 'bar',
         data: {
             labels: ['Daily', 'Weekly', 'Monthly'],
             datasets: [{
-                label: 'Update Frequency',
-                data: [daily_updated, weekly_updated, updated_tickets],
+                data: [bug_daily_updated, bug_weekly_updated, bug_monthly_updated],
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.25)',
                     'rgba(54, 162, 235, 0.25)',
@@ -160,7 +156,107 @@
                         beginAtZero: true
                     }
                 }]
-            }
+            },
+            title: {
+                display: true,
+                text: 'Bug Update Frequency',
+                fontSize: 20,
+                fontStyle: "bold"
+            },
+            legend: {
+                display: false
+            },
+        }
+    });
+
+    var feature_todo_count = {{ feature_todo_count|safe }};
+    var feature_in_progress_count = {{ feature_in_progress_count|safe }};
+    var feature_completed_count = {{ feature_completed_count|safe }};
+
+    new Chart(document.getElementById('feature_status'), {
+        type: 'pie',
+        data: {
+            labels: ['To-Do', 'In Progress', 'Completed'],
+            datasets: [{
+                label: 'Ticket Status',
+                data: [feature_todo_count, feature_in_progress_count, feature_completed_count],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.25)',
+                    'rgba(54, 162, 235, 0.25)',
+                    'rgba(255, 206, 86, 0.25)'
+                ],
+                hoverBackgroundColor: [
+                    'rgba(255, 99, 132, 0.5)',
+                    'rgba(54, 162, 235, 0.5)',
+                    'rgba(255, 206, 86, 0.5)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+                title: {
+                    display: true,
+                    text: 'Feature Status',
+                    fontSize: 20,
+                    fontStyle: "bold"
+                },
+                legend: {
+                    display: true,
+                    position: 'right'
+                },
+            },
+    });
+
+    var feature_daily_updated = {{ feature_daily_updated|safe }};
+    var feature_weekly_updated = {{ feature_weekly_updated|safe }};
+    var feature_monthly_updated = {{ feature_monthly_updated|safe }};
+
+    new Chart(document.getElementById('feature_updated'), {
+        type: 'bar',
+        data: {
+            labels: ['Daily', 'Weekly', 'Monthly'],
+            datasets: [{
+                data: [feature_daily_updated, feature_weekly_updated, feature_monthly_updated],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.25)',
+                    'rgba(54, 162, 235, 0.25)',
+                    'rgba(255, 206, 86, 0.25)'
+                ],
+                hoverBackgroundColor: [
+                    'rgba(255, 99, 132, 0.5)',
+                    'rgba(54, 162, 235, 0.5)',
+                    'rgba(255, 206, 86, 0.5)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            },
+            title: {
+                display: true,
+                text: 'Feature Update Frequency',
+                fontSize: 20,
+                fontStyle: "bold"
+            },
+            legend: {
+                display: false
+            },
         }
     });
 
