@@ -5,27 +5,52 @@ from tickets.models import Ticket
 import pytz
 
 def charts(request):
-    bugs_count = Ticket.objects.filter(ticket_type_id=1).count()
-    features_count = Ticket.objects.filter(ticket_type_id=2).count()
-    todo_count = Ticket.objects.filter(status_id=1).count()
-    in_progress_count = Ticket.objects.filter(status_id=2).count()
-    completed_count = Ticket.objects.filter(status_id=3).count()
+    bug_reports = Ticket.objects.filter(ticket_type=1)
+    feature_requests = Ticket.objects.filter(ticket_type=2)
+    
+    bug_status = [
+        item["status"] for item in bug_reports.values("status")
+    ]
+    bug_todo_count = bug_status.count(1)
+    bug_in_progress_count = bug_status.count(2)
+    bug_completed_count = bug_status.count(3)
 
-    # Date range for bugs/features updated daily/weekl/monthly
-    startdate = timezone.now() - timedelta(days=30)
-    enddate = timezone.now()
-    updated_tickets = Ticket.objects.filter(last_updated__range=[startdate, enddate]).count()
-    weekly_updated = updated_tickets / 4
-    daily_updated = updated_tickets / 30
+    feature_status = [
+        item["status"] for item in feature_requests.values("status")
+    ]
+    feature_todo_count = feature_status.count(1)
+    feature_in_progress_count = feature_status.count(2)
+    feature_completed_count = feature_status.count(3)
+
+    # Date range for bugs/features updated daily/weekly/monthly
+    updated_bugs = [int(item["last_updated"].timestamp()) for item in bug_reports.values("last_updated")]
+    updated_features = [int(item["last_updated"].timestamp()) for item in feature_requests.values("last_updated")]
+
+    now = int(timezone.now().timestamp())
+    today = now - int(timedelta(days=1).total_seconds())
+    week = now - int(timedelta(days=7).total_seconds())
+    month = now - int(timedelta(days=30).total_seconds())
+
+    bug_daily_updated = len(list(x for x in updated_bugs if x in range(today, now)))
+    bug_weekly_updated = len(list(x for x in updated_bugs if x in range(week, now)))
+    bug_monthly_updated = len(list(x for x in updated_bugs if x in range(month, now)))
+
+    feature_daily_updated = len(list(x for x in updated_features if x in range(today, now)))
+    feature_weekly_updated = len(list(x for x in updated_features if x in range(week, now)))
+    feature_monthly_updated = len(list(x for x in updated_features if x in range(month, now)))
 
     context = {
-        "bugs_count": bugs_count,
-        "features_count": features_count,
-        "todo_count": todo_count,
-        "in_progress_count": in_progress_count,
-        "completed_count": completed_count,
-        "updated_tickets": updated_tickets,
-        "weekly_updated": weekly_updated,
-        "daily_updated": daily_updated
+        "bug_todo_count": bug_todo_count,
+        "bug_in_progress_count": bug_in_progress_count,
+        "bug_completed_count": bug_completed_count,
+        "bug_daily_updated": bug_daily_updated,
+        "bug_weekly_updated": bug_weekly_updated,
+        "bug_monthly_updated": bug_monthly_updated,
+        "feature_todo_count": feature_todo_count,
+        "feature_in_progress_count": feature_in_progress_count,
+        "feature_completed_count": feature_completed_count,
+        "feature_daily_updated": feature_daily_updated,
+        "feature_weekly_updated": feature_weekly_updated,
+        "feature_monthly_updated": feature_monthly_updated
     }
     return render(request, "charts.html", context)

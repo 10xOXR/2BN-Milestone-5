@@ -254,8 +254,8 @@
 
 <div id="modal-feature-upvote" class="modal">
     <div class="modal-content">
-        <h3 class="center">Upvote Feature</h3>
-        <h4 class="center">There is a €5 fee to upvote a Feature</h4>
+        <h1 class="purple-text text-darken-3 upper">Upvote Feature</h1>
+        <h2 class="center">There is a €5 fee to upvote a Feature</h2>
         <form id="payment-form" method="post" action="{% url 'upvote' ticket.id %}" data-token="{{ publishable }}">
             {% csrf_token %}
             <h5>Payment Details</h5>
