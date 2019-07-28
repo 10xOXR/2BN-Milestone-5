@@ -361,7 +361,7 @@ To implement this project on Heroku, the following must be completed:
 
 ### Media
 
-- Sources for all images used on the site can be found in [this file]().
+- Sources for all images used on the site can be found in [this file](https://github.com/10xOXR/2BN-Milestone-5/tree/master/design/sources.txt).
 
 
 ### Acknowledgements
