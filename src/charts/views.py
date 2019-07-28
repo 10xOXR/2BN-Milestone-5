@@ -2,7 +2,7 @@ from django.shortcuts import render
 from datetime import date, timedelta
 from django.utils import timezone
 from tickets.models import Ticket
-import pytz
+
 
 def charts(request):
     bug_reports = Ticket.objects.filter(ticket_type=1)
