@@ -31,18 +31,18 @@ class TestUserRegistrationForm(TestCase):
             "first_name": "Test",
             "last_name": "User",
             "email": "test@test.com",
-            "password1": "Testuser1", 
+            "password1": "Testuser1",
             "password2": "Testuser1"
         })
         self.assertTrue(form.is_valid())
-    
+
     def test_passwords_do_not_match(self):
         form = UserRegistrationForm({
             "username": "TestUser",
             "first_name": "Test",
             "last_name": "User",
             "email": "test@test.com",
-            "password1": "Testuser1", 
+            "password1": "Testuser1"
             "password2": "Testuser2"
         })
         self.assertFalse(form.is_valid())
@@ -65,6 +65,7 @@ class TestProfileUpdateForm(TestCase):
         self.assertIsNotNone(ProfileUpdateForm)
 
 # VIEWS TESTS
+
 
 class TestIndexView(TestCase):
     def test_index(self):

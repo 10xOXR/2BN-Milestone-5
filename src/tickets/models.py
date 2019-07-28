@@ -15,8 +15,8 @@ class TicketStatus(models.Model):
     )
 
     class Meta:
-        verbose_name=("Ticket Status")
-        verbose_name_plural=("Ticket Status")
+        verbose_name = ("Ticket Status")
+        verbose_name_plural = ("Ticket Status")
 
     def __str__(self):
         return self.ticket_status
@@ -33,8 +33,8 @@ class TicketType(models.Model):
     )
 
     class Meta:
-        verbose_name=("Ticket Type")
-        verbose_name_plural=("Ticket Types")
+        verbose_name = ("Ticket Type")
+        verbose_name_plural = ("Ticket Types")
 
     def __str__(self):
         return self.ticket_type
@@ -80,7 +80,9 @@ class Ticket(models.Model):
         ordering = ("-last_updated", )
 
     def __str__(self):
-        return "#{0} [{1}] - {2}".format(self.id, self.ticket_type, self.title)
+        return "#{0} [{1}] - {2}".format(
+            self.id, self.ticket_type, self.title
+        )
 
 
 class Comment(models.Model):

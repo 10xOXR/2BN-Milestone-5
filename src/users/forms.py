@@ -83,6 +83,7 @@ class UserRegistrationForm(UserCreationForm):
             raise ValidationError("Passwords must match")
         return password2
 
+
 class UserUpdateForm(forms.ModelForm):
     first_name = forms.CharField(
         label="First Name",

@@ -5,8 +5,9 @@ from PIL import Image, ImageOps
 from io import BytesIO
 from django.core.files import File
 from django.core.files.storage import default_storage as storage
-from pathlib import Path 
-import os, mimetypes
+from pathlib import Path
+import os
+import mimetypes
 
 
 class Profile(models.Model):

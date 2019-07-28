@@ -19,8 +19,12 @@ def all_tickets(request):
     tkt_status = request.GET.get("tkt_status")
     tkt_type = request.GET.get("tkt_type")
     tickets = Ticket.objects.all()
-    tickets = tickets.filter(status__id=tkt_status) if tkt_status else tickets
-    tickets = tickets.filter(ticket_type__id=tkt_type) if tkt_type else tickets
+    tickets = (
+        tickets.filter(status__id=tkt_status) if tkt_status else tickets
+    )
+    tickets = (
+        tickets.filter(ticket_type__id=tkt_type) if tkt_type else tickets
+    )
 
     paginator = Paginator(tickets, 4)
     try:
@@ -76,12 +80,12 @@ def new_feature(request):
             try:
                 token = request.POST["stripeToken"]
                 customer = stripe.Charge.create(
-                    amount = 1000,
-                    currency = "EUR",
-                    description = (
-                        "Feature Request: "+\
-                            request.user.get_full_name() +\
-                            " (" + request.user.email + ")"),
+                    amount=1000,
+                    currency="EUR",
+                    description=(
+                        "Feature Request: " +
+                        request.user.get_full_name() +
+                        " (" + request.user.email + ")"),
                     source=token,
                 )
             except stripe.error.CardError:
@@ -96,7 +100,9 @@ def new_feature(request):
             else:
                 messages.error(request, "Unable to take payment!")
         else:
-            messages.error(request, "Unable to take a payment with that card!")
+            messages.error(
+                request, "Unable to take a payment with that card!"
+            )
     else:
         feature_form = TicketForm()
 
@@ -159,7 +165,9 @@ def admin_status_update(request, pk):
     tkt_status = request.GET.get("tkt_status")
     ticket.views -= 1
     ticket.save()
-    Ticket.objects.filter(id=ticket.pk).update(status=int(tkt_status), last_updated=timezone.now())
+    Ticket.objects.filter(id=ticket.pk).update(
+        status=int(tkt_status), last_updated=timezone.now()
+    )
     messages.success(request, "Ticket status updated!")
     return redirect(
         ticket_detail,
@@ -177,12 +185,12 @@ def upvote(request, pk):
         try:
             token = request.POST['stripeToken']
             customer = stripe.Charge.create(
-                amount = 500,
-                currency = "EUR",
-                description = (
-                    "Feature Upvote: "+\
-                        request.user.get_full_name() +\
-                        " (" + request.user.email + ")"),
+                amount=500,
+                currency="EUR",
+                description=(
+                    "Feature Upvote: " +
+                    request.user.get_full_name() +
+                    " (" + request.user.email + ")"),
                 source=token,
             )
         except stripe.error.CardError:
