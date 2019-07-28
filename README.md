@@ -308,6 +308,7 @@ Clone this GitHub repository by either clicking the green *Clone or download* bu
     - ***AWS_ACCESS_KEY_ID*** - AWS user credentials.
     - ***AWS_SECRET_ACCESS_KEY*** - AWS S3 credentials.
     - ***EMAIL_ADDRESS*** - to send password reset emails.
+    - ***EMAIL_PASSWORD*** - authenticate email account.
     - ***DATABASE_URL*** - Remote PostgreSQL database link if using a remote database.
 
     You must create accounts with both Stripe and Amazon S3. Prior knowledge on how to configure a publicly accessible S3 Bucket and the Stripe API are assumed for this project, as detailed instructions are beyond the scope of this document.
