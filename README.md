@@ -286,8 +286,6 @@ The project was tested to ensure full usability across the following browsers an
 
 ## Deployment
 
-TBD
-
 ### Local Deployment
 
 Before you are able to deploy and run this application locally, you must have the following installed on your system:
