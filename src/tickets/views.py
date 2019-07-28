@@ -136,22 +136,12 @@ def ticket_detail(request, pk):
     ticket_status_list = TicketStatus.objects.all()
     tkt_status = ticket.status.id
     new_comment = CommentForm()
-    previous = request.META.get('HTTP_REFERER')
-    restore_args = None
-    if previous:
-        if "edit" in previous or "new" in previous:
-            restore_args = request.session.get('prev_args')
-        else:
-            parsed = urlparse(previous).query
-            request.session['prev_args'] = parsed
 
     context = {
         "ticket": ticket,
         "comments": comments,
         "voters": voters,
         "publishable": settings.STRIPE_PUBLISHABLE,
-        "previous": previous,
-        "args": restore_args,
         "ticket_status_list": ticket_status_list,
         "tkt_status": tkt_status,
         "new_comment": new_comment

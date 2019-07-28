@@ -113,32 +113,35 @@
                             <div class="col s12">
 
                                 {% if user.is_authenticated %}
-                                    {% if user.id in voters %}
-                                        <a href="{% url 'downvote' ticket.id %}" class="btn red darken-4">
-                                            Remove Vote
-                                        </a>
-                                    {% else %}
-                                        {% if ticket.ticket_type_id == 2 %}
-                                            <a href="#modal-feature-upvote" class="btn modal-trigger">
-                                                Upvote
+                                    {% if ticket.status_id != 3 %}
+                                        {% if user.id in voters %}
+                                            <a href="{% url 'downvote' ticket.id %}" class="btn red darken-4">
+                                                Remove Vote
                                             </a>
                                         {% else %}
-                                            <a href="{% url 'upvote' ticket.id %}" class="btn">
-                                                Upvote
+                                            {% if ticket.ticket_type_id == 2 %}
+                                                <a href="#modal-feature-upvote" class="btn modal-trigger">
+                                                    Upvote
+                                                </a>
+                                            {% else %}
+                                                <a href="{% url 'upvote' ticket.id %}" class="btn">
+                                                    Upvote
+                                                </a>
+                                            {% endif %}
+                                        {% endif %}
+                                        {% if user.id == ticket.raised_by.id or user.is_superuser %}
+                                            <a href="{% url 'edit_ticket' ticket.id %}" class="btn">
+                                                Edit
                                             </a>
                                         {% endif %}
                                     {% endif %}
-                                {% endif %}
 
-                                {% if user.id == ticket.raised_by.id or user.is_superuser %}
-                                <a href="{% url 'edit_ticket' ticket.id %}" class="btn">
-                                    Edit
-                                </a>
-                                <a href="#modal-delete" class="btn modal-trigger red darken-4">
-                                    Delete
-                                </a>
+                                    {% if user.id == ticket.raised_by.id or user.is_superuser %}
+                                    <a href="#modal-delete" class="btn modal-trigger red darken-4">
+                                        Delete
+                                    </a>
+                                    {% endif %}
                                 {% endif %}
-
                             </div>
                         </div>
 
@@ -231,13 +234,7 @@
 
     <div class="row">
         <div class="col s12 center-align">
-            {% if "new" in previous  %}
-                <a href="{% url 'all_tickets' %}" class="btn btn-large">Go back</a>
-            {% elif "edit" in previous %}
-                <a href="{% url 'all_tickets' %}?{{ args }}" class="btn btn-large">Go back</a>
-            {% else %}
-                <a href="javascript:history.back();" class="btn btn-large">Go back</a>
-            {% endif %}
+            <a href="{% url 'all_tickets' %}" class="btn btn-large">Back to Tickets</a>
         </div>
     </div>
 
