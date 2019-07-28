@@ -15,6 +15,7 @@ class UserLoginForm(forms.Form):
 
 class UserRegistrationForm(UserCreationForm):
     """ Form used to register a new user """
+
     username = forms.CharField(
         min_length=5,
         max_length=15,
@@ -66,6 +67,11 @@ class UserRegistrationForm(UserCreationForm):
             "password1", "password2"]
 
     def clean_email(self):
+        """
+        Ensures that the data from the form passes all validation before
+        being stored in the database.
+        """
+
         email = self.cleaned_data.get("email")
         username = self.cleaned_data.get("username")
 
@@ -85,6 +91,10 @@ class UserRegistrationForm(UserCreationForm):
 
 
 class UserUpdateForm(forms.ModelForm):
+    """
+    Form to update user details in their profile.
+    """
+
     first_name = forms.CharField(
         label="First Name",
         min_length=2,
@@ -110,6 +120,10 @@ class UserUpdateForm(forms.ModelForm):
 
 
 class ProfileUpdateForm(forms.ModelForm):
+    """
+    Allows user to update their profile picture.
+    """
+
     image = forms.ImageField(
         widget=forms.FileInput())
 

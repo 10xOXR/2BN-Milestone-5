@@ -5,6 +5,11 @@ from tickets.models import Ticket
 
 
 def charts(request):
+    """
+    Filters Bugs and Features from the database and then collates data
+    on the current status and update frequency of each. Passes data to
+    the template to be rendered by Charts.js
+    """
     bug_reports = Ticket.objects.filter(ticket_type=1)
     feature_requests = Ticket.objects.filter(ticket_type=2)
 
@@ -31,7 +36,8 @@ def charts(request):
         int(item["last_updated"].timestamp())
         for item in feature_requests.values("last_updated")
         ]
-
+    # Converts datetime objects into seconds since the Unix Epoch
+    # and returns length of each list
     now = int(timezone.now().timestamp())
     today = now - int(timedelta(days=1).total_seconds())
     week = now - int(timedelta(days=7).total_seconds())

@@ -11,18 +11,21 @@ from .forms import (
 
 def superuser(request):
     """ Allows access to the Admin Panel for superusers """
+
     if request.user.is_superuser:
         return redirect(reverse("superuser"))
 
 
 def index(request):
     """ Return the index.html file """
+
     return render(request, "index.html")
 
 
 @login_required()
 def logout(request):
     """ Logs the user out """
+
     auth.logout(request)
     messages.success(request, "You have been logged out successfully!")
     return redirect(reverse("login"))
@@ -30,6 +33,7 @@ def logout(request):
 
 def login(request):
     """ Return a login page """
+
     if request.user.is_authenticated:
         return redirect(reverse("index"))
 
@@ -65,6 +69,7 @@ def login(request):
 
 def registration(request):
     """ Render the registration page """
+
     if request.user.is_authenticated:
         return redirect(reverse("index"))
 
@@ -104,6 +109,7 @@ def registration(request):
 @login_required
 def profile(request):
     """ The user's profile page """
+
     user = User.objects.get(email=request.user.email)
     if request.method == "POST":
         user_form = UserUpdateForm(
