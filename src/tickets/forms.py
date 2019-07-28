@@ -27,6 +27,8 @@ class TicketForm(forms.ModelForm):
 
 
 class CommentForm(forms.ModelForm):
+    """ Displays the Comment form """
+
     comment_text = forms.CharField(
         max_length=2000,
         widget=forms.Textarea(),

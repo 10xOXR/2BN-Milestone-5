@@ -4,6 +4,8 @@ from django.utils import timezone
 
 
 class TicketStatus(models.Model):
+    """ Structure of a Ticket Status """
+
     TICKET_STATUS_OPTIONS = (
         ("To-Do (Not Started)", "To-Do (Not Started)"),
         ("In Progress", "In Progress"),
@@ -23,6 +25,8 @@ class TicketStatus(models.Model):
 
 
 class TicketType(models.Model):
+    """ Structure of a Ticket Types """
+
     TICKET_STATUS_OPTIONS = (
         ("Bug Report", "Bug Report"),
         ("Feature Request", "Feature Request")
@@ -41,7 +45,8 @@ class TicketType(models.Model):
 
 
 class Ticket(models.Model):
-    """ Structure of a Bug Ticket """
+    """ Structure of a Ticket """
+
     title = models.CharField(
         max_length=50,
         blank=False
@@ -87,6 +92,7 @@ class Ticket(models.Model):
 
 class Comment(models.Model):
     """ Structure of a single comment """
+
     ticket = models.ForeignKey(
         Ticket,
         on_delete=models.CASCADE,
@@ -110,6 +116,8 @@ class Comment(models.Model):
 
 
 class Upvote(models.Model):
+    """ Structure of Upvotes """
+
     ticket = models.ForeignKey(
         Ticket,
         on_delete=models.CASCADE,

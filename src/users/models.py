@@ -12,6 +12,7 @@ import mimetypes
 
 class Profile(models.Model):
     """ Additional profile data not held within the standard User model """
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     image = models.ImageField(
         default="profiles/default.jpg",
@@ -47,6 +48,8 @@ class Profile(models.Model):
 
 
 def create_profile(sender, created, instance, **kwargs):
+    """ Store the user profile in the database """
+
     if created:
         Profile.objects.create(user=instance)
 

@@ -13,6 +13,11 @@ stripe.api_key = settings.STRIPE_SECRET
 
 
 def all_tickets(request):
+    """
+    Displays all tickets to the user in the Tickets page, with all
+    necessary pagination.
+    """
+
     page = request.GET.get("page", 1)
     ticket_status_list = TicketStatus.objects.all()
     ticket_type_list = TicketType.objects.all()
@@ -50,6 +55,11 @@ def all_tickets(request):
 
 @login_required
 def new_bug(request):
+    """
+    Renders the New Bug page and redirects to the Ticket Detail
+    page when successfully submitted.
+    """
+
     if request.method == "POST":
         bug_form = TicketForm(request.POST)
         if bug_form.is_valid():
@@ -73,6 +83,11 @@ def new_bug(request):
 
 @login_required
 def new_feature(request):
+    """
+    Renders the New Feature page, takes payment from user, and redirects
+    to the Ticket Detail page when successfully submitted.
+    """
+
     if request.method == "POST":
         feature_form = TicketForm(request.POST)
 
@@ -119,6 +134,10 @@ def new_feature(request):
 
 @login_required
 def create_comment(request, pk):
+    """
+    Processes comments added via the Ticket Detail page and redirects back
+    to the same page after successfully posting comment.
+    """
     if request.method == "POST":
         parent_ticket = get_object_or_404(Ticket, pk=pk)
         new_comment = CommentForm(request.POST)
@@ -133,6 +152,11 @@ def create_comment(request, pk):
 
 
 def ticket_detail(request, pk):
+    """
+    Collects information related to a single ticket and renders the
+    Ticket Detail page.
+    """
+
     ticket = get_object_or_404(Ticket, pk=pk)
     ticket.views += 1
     ticket.save()
@@ -161,6 +185,11 @@ def ticket_detail(request, pk):
 
 @login_required
 def admin_status_update(request, pk):
+    """
+    Allows Admin users to change the current status of a ticket on
+    the Ticket Detail page.
+    """
+
     ticket = get_object_or_404(Ticket, pk=pk)
     tkt_status = request.GET.get("tkt_status")
     ticket.views -= 1
@@ -177,6 +206,11 @@ def admin_status_update(request, pk):
 
 @login_required
 def upvote(request, pk):
+    """
+    Processes upvotes on the Ticket Detail page and handles payments
+    where the upvote occurs on a Feature Request.
+    """
+
     ticket = get_object_or_404(Ticket, pk=pk)
     ticket.upvotes += 1
     ticket.views -= 1
@@ -217,6 +251,10 @@ def upvote(request, pk):
 
 @login_required
 def downvote(request, pk):
+    """
+    Processes downvotes on the Ticket Detail page.
+    """
+
     ticket = get_object_or_404(Ticket, pk=pk)
     ticket.upvotes -= 1
     ticket.views -= 1
@@ -233,6 +271,11 @@ def downvote(request, pk):
 
 @login_required
 def edit_ticket(request, pk):
+    """
+    Renders the Edit Ticket page and populates the form fields with
+    the pre-existing data from the ticket stored in the database.
+    """
+
     ticket = get_object_or_404(Ticket, pk=pk)
     if request.method == "POST":
         edit_ticket = TicketForm(request.POST, instance=ticket)
@@ -256,6 +299,10 @@ def edit_ticket(request, pk):
 
 @login_required
 def delete_ticket(request, pk):
+    """
+    Deletes a specified ticket.
+    """
+
     ticket = get_object_or_404(Ticket, pk=pk)
     ticket.delete()
 

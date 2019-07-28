@@ -40,6 +40,7 @@ class TestCommentForm(TestCase):
 # VIEWS TESTS
 
 class TestTicketsViews(TestCase):
+    
     def setUp(self):
         TicketStatus.objects.create(ticket_status="To-Do (Not Started)")
         TicketStatus.objects.create(ticket_status="In Progress")

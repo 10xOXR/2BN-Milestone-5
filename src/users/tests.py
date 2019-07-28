@@ -42,7 +42,7 @@ class TestUserRegistrationForm(TestCase):
             "first_name": "Test",
             "last_name": "User",
             "email": "test@test.com",
-            "password1": "Testuser1"
+            "password1": "Testuser1",
             "password2": "Testuser2"
         })
         self.assertFalse(form.is_valid())
