@@ -18,3 +18,4 @@ media/
 # Coverage test files
 htmlcov/
 .coverage
+.coveragerc
