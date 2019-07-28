@@ -17,6 +17,7 @@ from .views import (
 
 # FORM TESTS
 
+
 class TestTicketForm(TestCase):
 
     def test_form_is_valid(self):

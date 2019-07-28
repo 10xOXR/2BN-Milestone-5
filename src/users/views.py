@@ -42,7 +42,7 @@ def login(request):
                 password=request.POST["password"])
 
             if user:
-                auth.login(user=user, request=request)            
+                auth.login(user=user, request=request)
                 messages.success(request, "You have logged in successfully.")
                 return redirect(reverse("profile"))
             else:
@@ -67,7 +67,7 @@ def registration(request):
     """ Render the registration page """
     if request.user.is_authenticated:
         return redirect(reverse("index"))
-    
+
     if request.method == "POST":
         registration_form = UserRegistrationForm(request.POST)
 
@@ -83,7 +83,8 @@ def registration(request):
                 messages.success(request, "You have registered successfully")
                 return redirect(reverse("profile"))
             else:
-                messages.error(request,
+                messages.error(
+                    request,
                     "There has been an error with your registration.\
                     Please try again.")
 
