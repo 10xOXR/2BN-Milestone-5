@@ -1,7 +1,8 @@
-from django.shortcuts import render, redirect, reverse
+from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from.models import Badges, BadgeType
 from .forms import (
     UserLoginForm,
     UserRegistrationForm,
@@ -86,6 +87,9 @@ def registration(request):
             if user:
                 auth.login(user=user, request=request)
                 messages.success(request, "You have registered successfully")
+                new_user = User.objects.get(id=user.id)
+                badge = BadgeType.objects.get(badge_type="New User")
+                Badges.objects.create(user_id=new_user, badge_type=badge)
                 return redirect(reverse("profile"))
             else:
                 messages.error(

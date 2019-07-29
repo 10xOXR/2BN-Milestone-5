@@ -3,7 +3,9 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from .models import Ticket, Comment, Upvote, TicketStatus, TicketType
+from users.models import Profile
 from .forms import TicketForm, CommentForm
 from django.conf import settings
 import stripe
