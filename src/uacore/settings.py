@@ -172,3 +172,7 @@ EMAIL_PORT = 587
 # Override default persistant login
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+# Change default path for @login_required
+
+LOGIN_URL = '/users/login/'
