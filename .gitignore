@@ -3,7 +3,6 @@ __pycache__/
 *.py[cod]
 
 # Local folders
-static/
 media/
 
 # VSCode Files
