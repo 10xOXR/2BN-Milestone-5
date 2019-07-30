@@ -224,7 +224,8 @@ When users reached certain milestones in their participation with the site (such
 
 - **Heroku**
     - [Heroku](https://www.heroku.com) - Hosts the deployed version of this project.
-- **Python**    
+    - [Heroku Postgres](https://www.heroku.com/postgres) - PostgreSQL is one of the world's most popular relational database management systems.
+- **Python**
     - [Python 3.7.3](https://www.python.org/) - Python is an interpreted, high-level, general-purpose programming language and is the language used for all backend functions of this project.
     - [Django 1.11.22](https://www.djangoproject.com/) - Django is a high-level Python Web framework that encourages rapid development and clean, pragmatic design.
 - **Amazon Web Services**
