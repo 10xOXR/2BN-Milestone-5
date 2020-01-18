@@ -36,11 +36,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_cleanup',
-    'materializecssform',
     'users',
     'tickets',
     'charts',
     'storages',
+    'materializecssform',
 ]
 
 MIDDLEWARE = [
@@ -81,7 +81,7 @@ WSGI_APPLICATION = 'uacore.wsgi.application'
 
 if "DATABASE_URL" in os.environ:
     DATABASES = {
-            'default': dj_database_url.parse(os.getenv('DATABASE_URL'))
+        'default': dj_database_url.parse(os.getenv('DATABASE_URL'))
     }
 else:
     print("Postgres URL not found, using sqlite3 database")

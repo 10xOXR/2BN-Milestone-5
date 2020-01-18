@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import path
 from .views import (
     new_bug,
     new_feature,
@@ -13,16 +13,16 @@ from .views import (
 )
 
 urlpatterns = [
-    url(r'^$', all_tickets, name="all_tickets"),
-    url(r'^new/bug$', new_bug, name="new_bug"),
-    url(r'^new/feature$', new_feature, name="new_feature"),
-    url(r'^details/(?P<pk>\d+)', ticket_detail, name="ticket_detail"),
-    url(r'^upvote/(?P<pk>\d+)', upvote, name="upvote"),
-    url(r'^downvote/(?P<pk>\d+)', downvote, name="downvote"),
-    url(r'^edit/(?P<pk>\d+)', edit_ticket, name="edit_ticket"),
-    url(r'^add-comment/(?P<pk>\d+)', create_comment, name="create_comment"),
-    url(r'^delete/(?P<pk>\d+)', delete_ticket, name="delete_ticket"),
-    url(r'^status-update/(?P<pk>\d+)',
+    path("", all_tickets, name="all_tickets"),
+    path("new/bug", new_bug, name="new_bug"),
+    path("new/feature", new_feature, name="new_feature"),
+    path("details/<int:pk>", ticket_detail, name="ticket_detail"),
+    path("upvote/<int:pk>", upvote, name="upvote"),
+    path("downvote/<int:pk>", downvote, name="downvote"),
+    path("edit/<int:pk>", edit_ticket, name="edit_ticket"),
+    path("add-comment/<int:pk>", create_comment, name="create_comment"),
+    path("delete/<int:pk>", delete_ticket, name="delete_ticket"),
+    path("status-update/<int:pk>",
         admin_status_update, name="admin_status_update"
         ),
 ]

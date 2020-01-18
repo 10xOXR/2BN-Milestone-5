@@ -53,6 +53,7 @@ class Ticket(models.Model):
     )
     ticket_type = models.ForeignKey(
         TicketType,
+        on_delete=models.CASCADE,
         null=False
     )
     description = models.TextField(
@@ -78,6 +79,7 @@ class Ticket(models.Model):
     )
     status = models.ForeignKey(
         TicketStatus,
+        on_delete=models.CASCADE,
         default="1"
     )
 
