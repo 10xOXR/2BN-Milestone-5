@@ -40,19 +40,15 @@ class TestCommentForm(TestCase):
 # VIEWS TESTS
 
 class TestTicketsViews(TestCase):
-    
+
     def setUp(self):
         TicketStatus.objects.create(ticket_status="To-Do (Not Started)")
         TicketStatus.objects.create(ticket_status="In Progress")
         TicketType.objects.create(ticket_type="Bug Report")
         TicketType.objects.create(ticket_type="Feature Request")
-        previous = Client(
-            HTTP_REFERER='http://127.0.0.1:8000/tickets/',
-        )
         Ticket.objects.create(
             title="Test Bug",
             description="Test description1",
-            # status_id=1,
             status=TicketStatus(id=1),
             ticket_type=TicketType(id=1)).save()
         Ticket.objects.create(
@@ -60,14 +56,9 @@ class TestTicketsViews(TestCase):
             description="Test description2",
             status=TicketStatus(id=1),
             ticket_type=TicketType(id=2)).save()
-        self.client.post(
-            "/users/register/",
-            {"email": "Test@Email.com",
-                "username": "TestUser",
-                "first_name": "TestFirst",
-                "last_name": "TestLast",
-                "password1": "Testtest1",
-                "password2": "Testtest1"})
+        self.user = User.objects.create_user(
+            username='testuser', password='12345')
+        self.client.login(username='testuser', password='12345')
 
     def test_all_tickets(self):
         page = self.client.get("/tickets/")
@@ -141,11 +132,6 @@ class TestTicketsViews(TestCase):
 
     def test_tickets_delete(self):
         ticket = Ticket.objects.filter(title="Test Bug")[0]
-        response = self.client.get(
-            "/tickets/{0}".format(ticket.pk), follow=True)
-        results = Ticket.objects.filter(
-            description="Test description1").count()
-        self.assertEqual(results, 1)
         self.client.get("/tickets/delete/{0}".format(ticket.pk), follow=True)
         tickets_delete = Ticket.objects.filter(title="Test Bug").count()
         self.assertEqual(tickets_delete, 0)

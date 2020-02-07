@@ -25,14 +25,15 @@ class TestUserLoginForm(TestCase):
 
 
 class TestUserRegistrationForm(TestCase):
+
     def test_registration_form_is_valid(self):
         form = UserRegistrationForm({
             "username": "TestUser",
-            "first_name": "Test",
-            "last_name": "User",
+            "first_name": "Test1",
+            "last_name": "User1",
             "email": "test@test.com",
-            "password1": "Testuser1",
-            "password2": "Testuser1"
+            "password1": "Thisshouldwork1",
+            "password2": "Thisshouldwork1"
         })
         self.assertTrue(form.is_valid())
 
