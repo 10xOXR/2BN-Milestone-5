@@ -83,7 +83,7 @@ Frameworks used in the project are:
 
  - [Materialize 1.0.0](https://materializecss.com/)
     - Using the Materialize framework allowed for the development of a clean and modern user interface with minimal need to override or alter the default settings in most cases.
-- [Django 2.2](http://flask.pocoo.org/)
+- [Django 2.2](https://www.djangoproject.com/)
     - Django is a high-level Python Web framework that encourages rapid development and clean, pragmatic design.
 - [jQuery 3.4.1](https://code.jquery.com/jquery/)
     - Although mostly unbound from jQuery in version 1.0.0, Materialize still requires some jQuery in order to properly initialize its elements (such as dropdowns, carousels, etc.).
