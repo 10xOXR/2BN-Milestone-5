@@ -8,23 +8,30 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 PROJECT_DIR = BASE_DIR.parent
 
 # If developing locally and using '.env' then import env and set DEBUG to True
+# Do not infer DEBUG from .env existing; Docker Compose also uses .env in production.
 if (PROJECT_DIR / '.env').exists():
     from dotenv import load_dotenv
     load_dotenv(PROJECT_DIR / '.env')
-    DEBUG = True
-else:
-    DEBUG = False
+
+DEBUG = os.getenv("DJANGO_DEBUG", "False").lower() in ("true", "1", "yes")
 
 # Django Secret Key
 SECRET_KEY = os.getenv("SECRET_KEY")
 
-ALLOWED_HOSTS = []
+if not SECRET_KEY:
+    raise RuntimeError("SECRET_KEY environment variable is required")
 
-# Append content of 'SITE_NAME' env variable to 'ALLOWED_HOSTS'
-# if it exists. Required for deployed site to run.
-host = os.getenv("SITE_NAME")
-if host:
-    ALLOWED_HOSTS.append(host)
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.getenv("DJANGO_ALLOWED_HOSTS", os.getenv("SITE_NAME", "")).split(",")
+    if host.strip()
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
+    if origin.strip()
+]
 
 # Application definition
 
@@ -45,6 +52,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -54,6 +62,10 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'uacore.urls'
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
 
 TEMPLATES = [
     {
@@ -148,30 +160,43 @@ STATICFILES_DIRS = [
 ]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-MEDIAFILES_LOCATION = 'media'
-
 MEDIA_ROOT = BASE_DIR / "media"
-MEDIA_URL = (
-    "/media/" if DEBUG else
-    "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, MEDIAFILES_LOCATION)
-)
+MEDIA_URL = "/media/"
 
-STORAGES = {
-    "default": {
-        "BACKEND": (
-            "django.core.files.storage.FileSystemStorage"
-            if DEBUG else
-            "custom_storages.MediaStorage"
-        ),
-    },
-    "staticfiles": {
-        "BACKEND": (
-            "django.contrib.staticfiles.storage.StaticFilesStorage"
-            if DEBUG else
-            "custom_storages.StaticStorage"
-        ),
-    },
-}
+USE_S3 = os.getenv("USE_S3", "False").lower() in ("true", "1", "yes")
+
+if USE_S3:
+    AWS_S3_OBJECT_PARAMETERS = {
+        'Expires': 'Thu, 31 Dec 2099 20:00:00 GMT',
+        'CacheControl': 'max-age=94608000',
+    }
+
+    AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME", "2bn-unicorn-attractor")
+    AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME", "eu-west-1")
+    AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+    AWS_DEFAULT_ACL = None
+    AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+
+    STORAGES = {
+        "default": {
+            "BACKEND": "custom_storages.MediaStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "custom_storages.StaticStorage",
+        },
+    }
+
+    MEDIA_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, "media")
+else:
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
 
 MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"
 
