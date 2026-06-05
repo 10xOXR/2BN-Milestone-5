@@ -1,19 +1,19 @@
 import os
+from pathlib import Path
 import dj_database_url
 
 
-# If developing locally and using 'env.py' then import env
-# and set DEBUG to True
-if os.path.exists('../.env'):
+# Build paths inside the project like this: BASE_DIR / ...
+BASE_DIR = Path(__file__).resolve().parent.parent
+PROJECT_DIR = BASE_DIR.parent
+
+# If developing locally and using '.env' then import env and set DEBUG to True
+if (PROJECT_DIR / '.env').exists():
     from dotenv import load_dotenv
-    load_dotenv()
+    load_dotenv(PROJECT_DIR / '.env')
     DEBUG = True
 else:
     DEBUG = False
-    STATICFILES_STORAGE = 'custom_storages.StaticStorage'
-
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Django Secret Key
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -35,12 +35,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_cleanup',
     'users',
     'tickets',
     'charts',
     'storages',
     'materializecssform',
+    'django_cleanup.apps.CleanupConfig',
 ]
 
 MIDDLEWARE = [
@@ -79,7 +79,7 @@ WSGI_APPLICATION = 'uacore.wsgi.application'
 
 # Databases
 
-if "DATABASE_URL" in os.environ:
+if os.getenv("DATABASE_URL") and not os.getenv("USE_SQLITE"):
     DATABASES = {
         'default': dj_database_url.parse(os.getenv('DATABASE_URL'))
     }
@@ -123,8 +123,6 @@ TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
-USE_L10N = True
-
 USE_TZ = True
 
 AWS_S3_OBJECT_PARAMETERS = {
@@ -146,15 +144,34 @@ STATICFILES_LOCATION = 'static'
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static")
+    BASE_DIR / "static"
 ]
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIAFILES_LOCATION = 'media'
-DEFAULT_FILE_STORAGE = 'custom_storages.MediaStorage'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-MEDIA_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, MEDIAFILES_LOCATION)
+MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_URL = (
+    "/media/" if DEBUG else
+    "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, MEDIAFILES_LOCATION)
+)
+
+STORAGES = {
+    "default": {
+        "BACKEND": (
+            "django.core.files.storage.FileSystemStorage"
+            if DEBUG else
+            "custom_storages.MediaStorage"
+        ),
+    },
+    "staticfiles": {
+        "BACKEND": (
+            "django.contrib.staticfiles.storage.StaticFilesStorage"
+            if DEBUG else
+            "custom_storages.StaticStorage"
+        ),
+    },
+}
 
 MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"
 
@@ -176,3 +193,5 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # Change default path for @login_required
 
 LOGIN_URL = '/users/login/'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'

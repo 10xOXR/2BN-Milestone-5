@@ -1,15 +1,17 @@
-[![Build Status](https://travis-ci.org/10xOXR/2BN-Milestone-5.svg?branch=master)](https://travis-ci.org/10xOXR/2BN-Milestone-5)
-
-#   [The Unicorn Attractor - Issue Tracker](https://django-2bn-unicorn.herokuapp.com/)
+# The Unicorn Attractor - Issue Tracker
 
 Welcome to the issue tracker for the world's leading dating app - The Unicorn Attractor!
 
 With The Unicorn Attractor, you'll meet new people that share in your Unicorn love. Think of us as your most dependable wingman - wherever you go, we’ll be there, offering all the possibilities of riding off into the sunset!
 
+> Maintenance note: this project was originally built in 2019 for a Code Institute milestone. It has since been refreshed to run on modern Python/Django tooling, while keeping the original app structure and functionality largely intact.
+
 ---
  
 ## Table of Contents
-1. [**UX**](#ux)
+1. [**Current Maintenance Status**](#current-maintenance-status)
+
+2. [**UX**](#ux)
     - [**User Stories**](#user-stories)
     - [**Design**](#design)
         - [**Framework**](#framework)
@@ -17,27 +19,61 @@ With The Unicorn Attractor, you'll meet new people that share in your Unicorn lo
         - [**Typography**](#typography)
     - [**Wireframes**](#wireframes)
 
-2. [**Features**](#features)
+3. [**Features**](#features)
     - [**Existing Features**](#existing-features)
     - [**Features Left to Implement**](#features-left-to-implement)
 
-3. [**Technologies Used**](#technologies-used)
+4. [**Technologies Used**](#technologies-used)
 
-4. [**Testing**](#testing)
+5. [**Testing**](#testing)
     - [**Automated Testing**](#automated-testing)
     - [**Manual Testing**](#manual-testing)
     - [**Validators**](#validators)
     - [**Compatibility**](#compatibility)
 
-5. [**Deployment**](#deployment)
+6. [**Deployment**](#deployment)
     - [**Local Deployment**](#local-deployment)
     - [**Remote Deployment**](#remote-deployment)
 
-6. [**Credits**](#credits)
+7. [**Credits**](#credits)
     - [**Content**](#content)
     - [**Media**](#media)
     - [**Code**](#code)
     - [**Acknowledgements**](#acknowledgements)
+
+---
+
+## Current Maintenance Status
+
+The project has been upgraded from the original Django 2.x-era dependency set to a modern Django LTS stack.
+
+Current local baseline:
+
+- Python 3.14 in a local `.venv`
+- Django 5.2.14
+- Pillow 12.2.0
+- django-storages 1.14.6
+- django-cleanup 9.0.0
+- psycopg 3.2.13
+- stripe 15.1.0
+
+Notable upgrade changes:
+
+- Replaced legacy `STATICFILES_STORAGE` / `DEFAULT_FILE_STORAGE` settings with Django's modern `STORAGES` setting.
+- Replaced `{% load staticfiles %}` with `{% load static %}` in templates.
+- Replaced Pillow's removed `Image.ANTIALIAS` constant with `Image.Resampling.LANCZOS`.
+- Local development can use SQLite even when `.env` contains a remote `DATABASE_URL` by setting `USE_SQLITE=1`.
+- Local development uses filesystem media/static storage instead of S3.
+- Ticket status updates, upvotes/downvotes, and ticket deletion now use POST requests with CSRF protection.
+- Delete and status update permissions are enforced in the Django views.
+
+Known remaining modernization work:
+
+- The Stripe integration still uses the legacy Charges API shape. It imports under the current SDK, but should be migrated to Payment Intents or Checkout before any real payment use.
+- The visual frontend dependencies are still the original CDN-era stack: Materialize 1.0.0, jQuery 3.4.1, Font Awesome 5, and Chart.js 2.8.0.
+- `django-materializecss-form` is pinned to its latest available release, but it is an old package and should eventually be replaced with local form rendering/templates.
+
+##### back to [top](#table-of-contents)
 
 ---
 
@@ -81,9 +117,9 @@ The design of the site is based on standard Materialize elements, with their col
 
 Frameworks used in the project are:
 
- - [Materialize 1.0.0](https://materializecss.com/)
+- [Materialize 1.0.0](https://materializecss.com/)
     - Using the Materialize framework allowed for the development of a clean and modern user interface with minimal need to override or alter the default settings in most cases.
-- [Django 2.2](https://www.djangoproject.com/)
+- [Django 5.2](https://www.djangoproject.com/)
     - Django is a high-level Python Web framework that encourages rapid development and clean, pragmatic design.
 - [jQuery 3.4.1](https://code.jquery.com/jquery/)
     - Although mostly unbound from jQuery in version 1.0.0, Materialize still requires some jQuery in order to properly initialize its elements (such as dropdowns, carousels, etc.).
@@ -226,8 +262,8 @@ When users reached certain milestones in their participation with the site (such
     - [Heroku](https://www.heroku.com) - Hosts the deployed version of this project.
     - [Heroku Postgres](https://www.heroku.com/postgres) - PostgreSQL is one of the world's most popular relational database management systems.
 - **Python**
-    - [Python 3.7.3](https://www.python.org/) - Python is an interpreted, high-level, general-purpose programming language and is the language used for all backend functions of this project.
-    - [Django 1.11.22](https://www.djangoproject.com/) - Django is a high-level Python Web framework that encourages rapid development and clean, pragmatic design.
+    - [Python 3.14](https://www.python.org/) - Python is an interpreted, high-level, general-purpose programming language and is the language used for all backend functions of this project.
+    - [Django 5.2.14](https://www.djangoproject.com/) - Django is a high-level Python Web framework that encourages rapid development and clean, pragmatic design.
 - **Amazon Web Services**
     - [Amazon S3](https://aws.amazon.com/s3/) - Amazon Simple Storage Service is a service offered by Amazon Web Services that provides object storage through a web service interface. Amazon S3 uses the same scalable storage infrastructure that Amazon.com uses to run its global e-commerce network.
 
@@ -237,13 +273,36 @@ When users reached certain milestones in their participation with the site (such
 
 ## Testing
 
-Testing for this project has been completed using both automated and manual methods. 
+Testing for this project has been completed using both automated and manual methods.
 
 ### Automated Testing
 
-Automated testing has been conducted using standard UnitTests in combination with the [Coverage.py](https://coverage.readthedocs.io/en/v4.5.x/) testing tool. In all, 23 tests were written covering 70% of all possible code. The remainder being for non-user boilerplate code generated by Django. All tests pass successfully. 
+Automated testing has been conducted using standard UnitTests in combination with the [Coverage.py](https://coverage.readthedocs.io/) testing tool. In all, 23 tests were written covering the original app behavior. The remainder being for non-user boilerplate code generated by Django.
 
-Travis-CI integration has been completed and also shows all tests completing successfully, with the project showing as "build: passing".
+Current local verification command:
+
+```bash
+cd src
+USE_SQLITE=1 ../.venv/bin/python manage.py test
+```
+
+Current local result after the Django 5.2 upgrade:
+
+```text
+Ran 23 tests in 2.931s
+OK
+```
+
+Additional upgrade checks:
+
+```bash
+cd src
+USE_SQLITE=1 ../.venv/bin/python -Wd manage.py check
+USE_SQLITE=1 ../.venv/bin/python manage.py makemigrations --check --dry-run
+../.venv/bin/pip check
+```
+
+Travis-CI was used for the original project, but the old build badge/config should be treated as historical unless CI is reintroduced.
 
 ### Manual Testing
 
@@ -291,8 +350,8 @@ The project was tested to ensure full usability across the following browsers an
 
 Before you are able to deploy and run this application locally, you must have the following installed on your system:
 
-- [Python3](https://www.python.org/downloads) to run the application.
-- [PIP](https://pip.pypa.io/en/stable/installing) to install all app requirements.
+- [Python 3.14](https://www.python.org/downloads) to run the application.
+- [pip](https://pip.pypa.io/en/stable/installation/) to install all app requirements.
 - An IDE of your choice, such as [Microsoft Visual Studio Code](https://code.visualstudio.com).
 - [GIT](https://www.atlassian.com/git/tutorials/install-git) for cloning and version control.
 
@@ -302,7 +361,7 @@ Clone this GitHub repository by either clicking the green *Clone or download* bu
     - `git clone https://github.com/10xOXR/2BN-Milestone-5.git`.
 - Navigate to the correct file location after unpacking the files.
     - `cd <path to folder>`
-- Create a `.env` file containing the following environmental variables:
+- Create a `.env` file in the repository root containing the following environment variables as needed:
     - ***STRIPE_PUBLISHABLE*** - Used solely to identify your account with Stripe; it isn't secret.
     - ***STRIPE_SECRET*** -  Can perform any API request to Stripe without restriction.
     - ***SECRET_KEY*** - Standard secret key, any value.
@@ -312,40 +371,80 @@ Clone this GitHub repository by either clicking the green *Clone or download* bu
     - ***EMAIL_PASSWORD*** - authenticate email account.
     - ***DATABASE_URL*** - Remote PostgreSQL database link if using a remote database.
 
-    You must create accounts with both Stripe and Amazon S3. Prior knowledge on how to configure a publicly accessible S3 Bucket and the Stripe API are assumed for this project, as detailed instructions are beyond the scope of this document.
+    You must create accounts with both Stripe and Amazon S3 if using the payment and remote media storage integrations. Prior knowledge on how to configure a publicly accessible S3 Bucket and the Stripe API are assumed for this project, as detailed instructions are beyond the scope of this document.
 
+    For local development without the remote database, set `USE_SQLITE=1` when running Django commands. This forces the app to use local SQLite even if `.env` contains `DATABASE_URL`.
 
-- Install all requirements from the [requirements.txt](https://github.com/10xOXR/2BN-Milestone-5/blob/master/src/requirements.txt) file using this command:
-    - `sudo -H pip3 -r requirements.txt`
+- Create and activate a virtual environment from the repository root:
 
-- At the terminal prompt, type ```python manage.py runserver```. Django should now start running a development server from 'http://127.0.0.1:8000'. Copy and paste this address to your browser.
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
 
-    Running the project for the first time will caus Django to create a SQLite3 database named ```db.sqlite3```. Type the following command into the terminal to create the database schema:
-    - `python manage.py migrate`
+- Install all requirements from the [requirements.txt](https://github.com/10xOXR/2BN-Milestone-5/blob/master/src/requirements.txt) file:
 
-    Django will then migrate the files contained in the migrations folder to set up the following relational schema:
+```bash
+pip install -r src/requirements.txt
+```
 
-    ![Relational Schema Diagram](design/rs-diagram.png?raw=true "RS Diagram")
+- Apply migrations using local SQLite:
+
+```bash
+cd src
+USE_SQLITE=1 ../.venv/bin/python manage.py migrate
+```
+
+- Optional: create an admin user for local development:
+
+```bash
+USE_SQLITE=1 ../.venv/bin/python manage.py createsuperuser
+```
+
+- Start the development server:
+
+```bash
+USE_SQLITE=1 ../.venv/bin/python manage.py runserver
+```
+
+The application should now be available at:
+
+```text
+http://127.0.0.1:8000/
+```
+
+Running the project for the first time with `USE_SQLITE=1` will cause Django to create a SQLite database named `db.sqlite3`.
+
+Django will then migrate the files contained in the migrations folder to set up the following relational schema:
+
+![Relational Schema Diagram](design/rs-diagram.png?raw=true "RS Diagram")
 
 
 
 
 ### Remote Deployment
 
-To implement this project on Heroku, the following must be completed:
+The original project was deployed to Heroku. Treat these notes as historical guidance and re-check the current hosting provider documentation before deploying the modernized version.
 
-1. Create a **requirements.txt** file so Heroku can install the required dependencies to run the app.
-    - `sudo pip3 freeze --local > requirements.txt`
-    - My file can be found [here](https://github.com/10xOXR/2BN-Milestone-5/blob/master/src/requirements.txt).
-2. Create a **Procfile** to tell Heroku what type of application is being deployed, and how to run it.
-    - `echo web: web: gunicorn uacore.wsgi:application`
-    - My file can be found [here](https://github.com/10xOXR/2BN-Milestone-5/blob/master/src/Procfile).
-3. Sign up for or log into your Heroku account, create your project app, and click the **Deploy** tab. Select *Connect GitHub* as the Deployment Method, and select *Enable Automatic Deployment*.
-4. In the Heroku **Settings** tab, click on the *Reveal Config Vars* button to configure environmental variables as in the local deployment above.
-5. In the **Resources** tab, go to the Add-ons section and add the Heroku Postgres add-on. Choose the *Hobby* level when prompted. This will give you a remote database to use for your project. The database URI will be located in the Config Vars in the **Settings** tab.
-6. The app will now be deployed and built by Heroku and will be ready to run.
-7. Alter your project's ```settings.py``` file to connect to the remote database using the ```dj_database_url``` Python package.
-8. Follow the steps in the Local Deployments section above to migrate your schema to the remote database.
+For a Heroku-style deployment, the app expects:
+
+1. A `src/requirements.txt` file so the platform can install the required dependencies.
+2. A `src/Procfile` with a web process similar to:
+
+```text
+web: gunicorn uacore.wsgi:application
+```
+
+3. Environment variables equivalent to the `.env` values described in local deployment.
+4. A PostgreSQL database exposed through `DATABASE_URL`.
+5. AWS S3 credentials and bucket configuration for production media/static storage.
+6. Database migrations run against the remote database:
+
+```bash
+python manage.py migrate
+```
+
+Do not set `USE_SQLITE=1` in production.
 
 ##### back to [top](#table-of-contents)
 

@@ -3,6 +3,8 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
+from django.views.decorators.http import require_POST
 from .models import Ticket, Comment, Upvote, TicketStatus, TicketType
 from .forms import TicketForm, CommentForm
 from django.conf import settings
@@ -184,6 +186,7 @@ def ticket_detail(request, pk):
 
 
 @login_required
+@require_POST
 def admin_status_update(request, pk):
     """
     Allows Admin users to change the current status of a ticket on
@@ -191,7 +194,10 @@ def admin_status_update(request, pk):
     """
 
     ticket = get_object_or_404(Ticket, pk=pk)
-    tkt_status = request.GET.get("tkt_status")
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
+    tkt_status = request.POST.get("tkt_status")
     ticket.views -= 1
     ticket.save()
     Ticket.objects.filter(id=ticket.pk).update(
@@ -205,6 +211,7 @@ def admin_status_update(request, pk):
 
 
 @login_required
+@require_POST
 def upvote(request, pk):
     """
     Processes upvotes on the Ticket Detail page and handles payments
@@ -212,10 +219,13 @@ def upvote(request, pk):
     """
 
     ticket = get_object_or_404(Ticket, pk=pk)
-    ticket.upvotes += 1
-    ticket.views -= 1
-    ticket.save()
-    if request.method == "POST":
+    if Upvote.objects.filter(
+        ticket_id=ticket.pk,
+        user_id=request.user.id
+    ).exists():
+        return redirect(ticket_detail, ticket.pk)
+
+    if ticket.ticket_type_id == 2:
         try:
             token = request.POST['stripeToken']
             customer = stripe.Charge.create(
@@ -229,20 +239,21 @@ def upvote(request, pk):
             )
         except stripe.error.CardError:
             messages.error(request, "Your card was declined!")
-        if customer.paid:
-                messages.success(request, "You have successfully paid!")
-                Upvote.objects.create(
-                    ticket_id=ticket.pk,
-                    user_id=request.user.id
-                )
-                return redirect(ticket_detail, ticket.pk)
-        else:
+            return redirect(ticket_detail, ticket.pk)
+
+        if not customer.paid:
             messages.error(request, "Unable to take payment!")
-    else:
-        Upvote.objects.create(
-            ticket_id=ticket.pk,
-            user_id=request.user.id
-        )
+            return redirect(ticket_detail, ticket.pk)
+
+        messages.success(request, "You have successfully paid!")
+
+    Upvote.objects.create(
+        ticket_id=ticket.pk,
+        user_id=request.user.id
+    )
+    ticket.upvotes += 1
+    ticket.views -= 1
+    ticket.save()
     return redirect(
         ticket_detail,
         ticket.pk
@@ -250,19 +261,21 @@ def upvote(request, pk):
 
 
 @login_required
+@require_POST
 def downvote(request, pk):
     """
     Processes downvotes on the Ticket Detail page.
     """
 
     ticket = get_object_or_404(Ticket, pk=pk)
-    ticket.upvotes -= 1
-    ticket.views -= 1
-    ticket.save()
-    Upvote.objects.filter(
+    deleted, _ = Upvote.objects.filter(
         ticket_id=ticket.pk,
         user_id=request.user.id
     ).delete()
+    if deleted:
+        ticket.upvotes = max(ticket.upvotes - 1, 0)
+        ticket.views -= 1
+        ticket.save()
     return redirect(
         ticket_detail,
         ticket.pk
@@ -298,12 +311,16 @@ def edit_ticket(request, pk):
 
 
 @login_required
+@require_POST
 def delete_ticket(request, pk):
     """
     Deletes a specified ticket.
     """
 
     ticket = get_object_or_404(Ticket, pk=pk)
+    if request.user != ticket.raised_by and not request.user.is_superuser:
+        raise PermissionDenied
+
     ticket.delete()
 
     return redirect(all_tickets)

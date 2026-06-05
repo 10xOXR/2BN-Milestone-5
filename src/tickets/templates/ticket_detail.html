@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load staticfiles %}
+{% load static %}
 
 {% load materializecss %}
 
@@ -115,18 +115,24 @@
                                 {% if user.is_authenticated %}
                                     {% if ticket.status_id != 3 %}
                                         {% if user.id in voters %}
-                                            <a href="{% url 'downvote' ticket.id %}" class="btn red darken-4">
-                                                Remove Vote
-                                            </a>
+                                            <form action="{% url 'downvote' ticket.id %}" method="post" class="inline-form">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn red darken-4">
+                                                    Remove Vote
+                                                </button>
+                                            </form>
                                         {% else %}
                                             {% if ticket.ticket_type_id == 2 %}
                                                 <a href="#modal-feature-upvote" class="btn modal-trigger">
                                                     Upvote
                                                 </a>
                                             {% else %}
-                                                <a href="{% url 'upvote' ticket.id %}" class="btn">
-                                                    Upvote
-                                                </a>
+                                                <form action="{% url 'upvote' ticket.id %}" method="post" class="inline-form">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn">
+                                                        Upvote
+                                                    </button>
+                                                </form>
                                             {% endif %}
                                         {% endif %}
                                         {% if user.id == ticket.raised_by.id or user.is_superuser %}
@@ -151,7 +157,8 @@
                             <br>
 
                             <div class="row">
-                                <form action="{% url 'admin_status_update' ticket.id %}" method="get">
+                                <form action="{% url 'admin_status_update' ticket.id %}" method="post">
+                                    {% csrf_token %}
                                     <div class="col s12 m6">
                                         <select name="tkt_status" id="tkt_status" class="browser-default border">
                                             {% for status in ticket_status_list %}
@@ -244,7 +251,10 @@
     <div class="modal-content center-align">
         <h1 class="purple-text text-darken-3 upper">Delete Ticket</h1>
         <h2 class="center">Are you Sure? This cannot be undone!</h2>
-        <a href="{% url 'delete_ticket' ticket.id %}" class="btn red">Confirm</a>
+        <form action="{% url 'delete_ticket' ticket.id %}" method="post" class="inline-form">
+            {% csrf_token %}
+            <button type="submit" class="btn red">Confirm</button>
+        </form>
         <a href="#" class="btn modal-close">Cancel</a>
     </div>
 </div>

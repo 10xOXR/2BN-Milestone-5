@@ -85,7 +85,7 @@ class TestTicketsViews(TestCase):
         ticket = Ticket.objects.filter(title="Test Bug")[0]
         upvotes = ticket.upvotes
         self.assertEqual(upvotes, 0)
-        self.client.get(
+        self.client.post(
             "/tickets/upvote/{0}".format(ticket.pk), follow=True)
         upvote = Ticket.objects.filter(title="Test Bug")[0].upvotes
         self.assertEqual(upvote, 1)
@@ -94,10 +94,10 @@ class TestTicketsViews(TestCase):
         ticket = Ticket.objects.filter(title="Test Bug")[0]
         upvotes = ticket.upvotes
         self.assertEqual(upvotes, 0)
-        self.client.get(
+        self.client.post(
             "/tickets/upvote/{0}".format(ticket.pk), follow=True)
         upvote = Ticket.objects.filter(title="Test Bug")[0].upvotes
-        self.client.get(
+        self.client.post(
             "/tickets/downvote/{0}".format(ticket.pk), follow=True)
         downvote = Ticket.objects.filter(title="Test Bug")[0].upvotes
         self.assertEqual(downvote, 0)
@@ -132,6 +132,8 @@ class TestTicketsViews(TestCase):
 
     def test_tickets_delete(self):
         ticket = Ticket.objects.filter(title="Test Bug")[0]
-        self.client.get("/tickets/delete/{0}".format(ticket.pk), follow=True)
+        ticket.raised_by = self.user
+        ticket.save()
+        self.client.post("/tickets/delete/{0}".format(ticket.pk), follow=True)
         tickets_delete = Ticket.objects.filter(title="Test Bug").count()
         self.assertEqual(tickets_delete, 0)

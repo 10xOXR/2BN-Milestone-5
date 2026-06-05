@@ -28,6 +28,9 @@ class Profile(models.Model):
 
     def save(self, *args, **kwargs):
         super(Profile, self).save(*args, **kwargs)
+        if self.image.name == self._meta.get_field('image').default:
+            return
+
         thumbnail_image = Image.open(self.image)
         i_width, i_height = thumbnail_image.size
         max_size = (300, 300)
@@ -42,7 +45,7 @@ class Profile(models.Model):
 
         if i_width > 300:
             buffer = BytesIO()
-            thumbnail_image.thumbnail(max_size, Image.ANTIALIAS)
+            thumbnail_image.thumbnail(max_size, Image.Resampling.LANCZOS)
             filename_suffix = thumbnail_image.format.lower()
             image_format = image_types[filename_suffix]
             thumbnail_image.save(buffer, format=image_format)
